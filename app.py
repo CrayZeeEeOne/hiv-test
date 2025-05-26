@@ -4,6 +4,9 @@ import time
 from datetime import datetime, timedelta
 import io
 import pymysql
+import requests
+from google.oauth2 import id_token
+from google.auth.transport import requests as grequests
 
 app = Flask(__name__)
 app.secret_key = 'super-secret-key'  # Заміни на безпечний у продакшн
@@ -20,6 +23,11 @@ DB_CONFIG = {
     'charset': 'utf8mb4',
     'cursorclass': pymysql.cursors.DictCursor
 }
+
+GOOGLE_CLIENT_ID = "161637199681-cj1eqhcbbdur3rbmikk92uk7b0rlrc5p.apps.googleusercontent.com"
+
+FACEBOOK_APP_ID = "10078966155483125"
+FACEBOOK_APP_SECRET = "7ff23de7f68b9e7b949c406fca97855d"
 
 def get_db():
     if 'db' not in g:
@@ -88,6 +96,44 @@ def login():
         return jsonify({'message': f'Успішний вхід як {user_id}'})
     else:
         return jsonify({'error': 'Потрібно вказати user_id'}), 400
+
+@app.route('/login/google', methods=['POST'])
+def login_google():
+    data = request.get_json()
+    token = data.get('credential')
+
+    try:
+        idinfo = id_token.verify_oauth2_token(token, grequests.Request(), GOOGLE_CLIENT_ID)
+        userid = idinfo['sub']
+        email = idinfo.get('email')
+        session['user_id'] = f"google_{userid}"
+        return jsonify({'message': f"Успішний вхід через Google як {email}"})
+    except Exception as e:
+        return jsonify({'error': 'Помилка перевірки Google токена'}), 401
+
+@app.route('/login/facebook', methods=['POST'])
+def login_facebook():
+    data = request.get_json()
+    access_token = data.get('accessToken')
+    user_id = data.get('userID')
+
+    # Перевірка токена через Facebook Graph API
+    debug_url = f"https://graph.facebook.com/debug_token"
+    params = {
+        'input_token': access_token,
+        'access_token': f"{FACEBOOK_APP_ID}|{FACEBOOK_APP_SECRET}"
+    }
+    r = requests.get(debug_url, params=params)
+    result = r.json()
+
+    try:
+        if result['data']['is_valid'] and result['data']['user_id'] == user_id:
+            session['user_id'] = f"fb_{user_id}"
+            return jsonify({'message': 'Успішний вхід через Facebook'})
+        else:
+            return jsonify({'error': 'Недійсний токен Facebook'}), 401
+    except:
+        return jsonify({'error': 'Помилка при перевірці Facebook токена'}), 500
 
 @app.route('/upload', methods=['POST'])
 def upload():

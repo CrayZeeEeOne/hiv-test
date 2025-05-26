@@ -10,7 +10,7 @@
     <!-- Авторизація через соціальні мережі -->
     <h2>Вхід через соціальні мережі</h2>
 
-    <!-- Google Login -->
+    <!-- ✅ Google Login -->
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <div id="g_id_onload"
          data-client_id="161637199681-cj1eqhcbbdur3rbmikk92uk7b0rlrc5p.apps.googleusercontent.com"
@@ -20,7 +20,7 @@
 
     <br/>
 
-    <!-- Facebook Login -->
+    <!-- ✅ Facebook Login -->
     <div id="fb-root"></div>
     <script async defer crossorigin="anonymous"
             src="https://connect.facebook.net/uk_UA/sdk.js"></script>
@@ -37,8 +37,16 @@
         function checkLoginState() {
             FB.getLoginStatus(function(response) {
                 if(response.status === 'connected') {
-                    FB.api('/me', {fields: 'name,email'}, function(userData) {
-                        alert('Вхід через Facebook: ' + userData.name + ', email: ' + userData.email);
+                    const accessToken = response.authResponse.accessToken;
+                    const userID = response.authResponse.userID;
+
+                    // Надсилаємо токен на сервер
+                    fetch('/login/facebook', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({ accessToken: accessToken, userID: userID })
+                    }).then(r => r.json()).then(data => {
+                        alert(data.message || data.error);
                     });
                 } else {
                     alert('Будь ласка, увійдіть у Facebook');
@@ -200,11 +208,19 @@
             }
         }
 
+        // ✅ Google token → надсилається на бекенд
         function handleGoogleCredentialResponse(response) {
-            console.log("Google ID Token:", response.credential);
-            alert("Успішний вхід через Google");
-            // Можна відправити токен на сервер для перевірки
+            fetch('/login/google', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ credential: response.credential })
+            })
+            .then(res => res.json())
+            .then(data => {
+                alert(data.message || data.error);
+            });
         }
     </script>
 </body>
 </html>
+
