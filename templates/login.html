@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="uk">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8" />
     <title>Авторизація</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
     <style>
         body {
             margin: 0;
@@ -81,6 +82,7 @@
             margin-top: 20px;
             cursor: pointer;
             transition: all 0.25s ease;
+            color: #000;
         }
         button.main-btn:hover {
             background: #0ff;
@@ -96,33 +98,94 @@
             }
         }
     </style>
+
+    <!-- Google SDK -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+
+    <!-- Facebook SDK -->
+    <div id="fb-root"></div>
+    <script async defer crossorigin="anonymous"
+            src="https://connect.facebook.net/uk_UA/sdk.js"></script>
+    <script>
+        window.fbAsyncInit = function () {
+            FB.init({
+                appId: '10078966155483125',
+                cookie: true,
+                xfbml: true,
+                version: 'v18.0'
+            });
+            FB.AppEvents.logPageView();
+        };
+
+        function checkLoginState() {
+            FB.getLoginStatus(function(response) {
+                console.log('Facebook login status:', response);
+                if (response.status === 'connected') {
+                    const accessToken = response.authResponse.accessToken;
+                    console.log('Facebook Access Token:', accessToken);
+                    // Твоя логіка після успішного входу через Facebook
+                    alert('Успішний вхід через Facebook!');
+                } else {
+                    alert('Не вдалось авторизуватись через Facebook.');
+                }
+            });
+        }
+
+        // Виклик Facebook Login через SDK для кнопки
+        function facebookLogin() {
+            FB.login(function(response) {
+                if (response.authResponse) {
+                    checkLoginState();
+                } else {
+                    alert('Facebook login cancelled or failed.');
+                }
+            }, {scope: 'public_profile,email'});
+        }
+
+        // Обробка відповіді Google логіну
+        function handleGoogleCredentialResponse(response) {
+            console.log("Google JWT Token:", response.credential);
+            // Твоя логіка після успішного входу через Google
+            alert('Успішний вхід через Google!');
+        }
+
+        // Виклик Google логіну при натисканні кнопки
+        function googleLogin() {
+            // У Google Sign-In нового SDK немає функції виклику логіну вручну,
+            // але можна показати кнопку і ловити callback.
+            // Тому тут ми імітуємо клік по прихованій кнопці
+            // або показуємо повідомлення:
+            alert('Будь ласка, натисніть кнопку Google Sign-In для входу.');
+        }
+    </script>
+
+    <!-- Твій основний JS -->
+    <script src="js/main.js" defer></script>
 </head>
 <body>
     <div class="login-card">
         <h1>Авторизація</h1>
 
         <div class="social-buttons">
-            <button class="social-btn google-btn" onclick="window.location.href='/login/google'">
-                <img src="https://cdn-icons-png.flaticon.com/512/281/281764.png" alt="Google">
+            <button class="social-btn google-btn" onclick="googleLogin()">
+                <img src="https://cdn-icons-png.flaticon.com/512/281/281764.png" alt="Google" />
                 Google
             </button>
-            <button class="social-btn facebook-btn" onclick="window.location.href='/login/facebook'">
-                <img src="https://cdn-icons-png.flaticon.com/512/124/124010.png" alt="Facebook">
+            <button class="social-btn facebook-btn" onclick="facebookLogin()">
+                <img src="https://cdn-icons-png.flaticon.com/512/124/124010.png" alt="Facebook" />
                 Facebook
             </button>
-
         </div>
 
         <button class="main-btn" onclick="window.location.href='/'">⬅️ На головну</button>
     </div>
 
-    <script>
-        function googleLogin() {
-            alert("Google авторизація — підключення.");
-        }
-        function facebookLogin() {
-            alert("Facebook авторизація — підключення.");
-        }
-    </script>
+    <!-- Офіційні Google Sign-In кнопки (приховані, для роботи SDK) -->
+    <div id="g_id_onload"
+         data-client_id="161637199681-cj1eqhcbbdur3rbmikk92uk7b0rlrc5p.apps.googleusercontent.com"
+         data-callback="handleGoogleCredentialResponse"
+         style="display:none">
+    </div>
+    <div class="g_id_signin" data-type="standard" style="display:none"></div>
 </body>
 </html>
