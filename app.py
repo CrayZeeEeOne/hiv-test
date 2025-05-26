@@ -108,32 +108,18 @@ def index():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'GET':
-        # Віддаємо HTML сторінку для GET-запитів
         return render_template('login.html')
 
     elif request.method == 'POST':
-        # Обробка POST-запиту для логіну
-        data = request.get_json()
-        if not data:
-            return jsonify({'error': 'Необхідно надати JSON дані'}), 400
+        user_id = request.form.get('user_id')
 
-        user_id = data.get('user_id')
-        if not user_id:
-            return jsonify({'error': 'Потрібно вказати user_id'}), 400
+        if not user_id or len(user_id.strip()) < 3:
+            return render_template('login.html', error='Невірний user_id (мін. 3 символи)')
 
-        # Додаткові перевірки (приклад)
-        if not isinstance(user_id, str) or len(user_id) < 3:
-            return jsonify({'error': 'Невірний формат user_id'}), 400
-
-        # Зберігаємо в сесії
-        session['user_id'] = user_id
+        session['user_id'] = user_id.strip()
         session['logged_in_at'] = datetime.utcnow().isoformat()
 
-        return jsonify({
-            'message': f'Успішний вхід як {user_id}',
-            'user_id': user_id,
-            'redirect': url_for('cabinet')  # Редірект після логіну
-        })
+        return redirect(url_for('cabinet'))
 
 @app.route('/login/google', methods=['POST'])
 def login_google():
