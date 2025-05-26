@@ -118,17 +118,18 @@
         };
 
         function checkLoginState() {
-            FB.getLoginStatus(function(response) {
-                console.log('Facebook login status:', response);
-                if (response.status === 'connected') {
-                    const accessToken = response.authResponse.accessToken;
-                    console.log('Facebook Access Token:', accessToken);
-                    // Твоя логіка після успішного входу через Facebook
-                    alert('Успішний вхід через Facebook!');
-                } else {
-                    alert('Не вдалось авторизуватись через Facebook.');
-                }
-            });
+        FB.getLoginStatus(function(response) {
+            if (response.status === 'connected') {
+                // Можна зберегти токен чи інші дані в localStorage/sessionStorage, якщо треба
+                sessionStorage.setItem('fbAccessToken', response.authResponse.accessToken);
+                sessionStorage.setItem('fbUserID', response.authResponse.userID);
+
+                // Редірект на головну сторінку
+                window.location.href = '/index.html';
+            } else {
+                alert('Не вдалось авторизуватись через Facebook.');
+            }
+        });
         }
 
         // Виклик Facebook Login через SDK для кнопки
@@ -171,11 +172,13 @@
                 <img src="https://cdn-icons-png.flaticon.com/512/281/281764.png" alt="Google" />
                 Google
             </button>
-            <button class="social-btn facebook-btn" onclick="facebookLogin()">
-                <img src="https://cdn-icons-png.flaticon.com/512/124/124010.png" alt="Facebook" />
+
+            <fb:login-button scope="public_profile,email" onlogin="checkLoginState();" class="social-btn facebook-btn" style="display:flex; align-items:center; justify-content:center; gap:8px; border:none; cursor:pointer; font-weight:bold; font-size:1rem; border-radius:12px; padding:14px 0; width:100%;">
+                <img src="https://cdn-icons-png.flaticon.com/512/124/124010.png" alt="Facebook" style="width:22px; height:22px;" />
                 Facebook
-            </button>
+            </fb:login-button>
         </div>
+
 
         <button class="main-btn" onclick="window.location.href='/'">⬅️ На головну</button>
     </div>
