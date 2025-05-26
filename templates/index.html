@@ -4,45 +4,30 @@
     <meta charset="UTF-8" />
     <title>Тест швидкості Інтернету</title>
 
+    <!-- Підключення Google SDK -->
     <script src="https://accounts.google.com/gsi/client" async defer></script>
 
-    <!-- Facebook SDK -->
+    <!-- Підключення Facebook SDK -->
+    <div id="fb-root"></div>
     <script async defer crossorigin="anonymous"
-        src="https://connect.facebook.net/uk_UA/sdk.js"></script>
+            src="https://connect.facebook.net/uk_UA/sdk.js"></script>
 
-    <!-- Твій main.js -->
+    <!-- Підключення власного JS-файлу -->
     <script src="js/main.js" defer></script>
 </head>
 <body>
-
     <h1>Тест швидкості Інтернету</h1>
 
     <h2>Вхід через соціальні мережі</h2>
 
-    <!-- Google Sign-In кнопка (без автоматичного входу) -->
-    <div class="g_id_signin"
-         data-type="standard"
-         data-size="large"
-         data-theme="outline"
-         data-text="sign_in_with"
-         data-shape="rectangular"
-         data-logo_alignment="left"
+    <div id="g_id_onload"
          data-client_id="161637199681-cj1eqhcbbdur3rbmikk92uk7b0rlrc5p.apps.googleusercontent.com"
          data-callback="handleGoogleCredentialResponse">
     </div>
+    <div class="g_id_signin" data-type="standard"></div>
 
     <br/>
 
-    <div id="fb-root"></div>
-
-    <!-- Google Sign-In кнопка -->
-    <div class="g_id_signin"
-         data-type="standard"
-         data-client_id="161637199681-cj1eqhcbbdur3rbmikk92uk7b0rlrc5p.apps.googleusercontent.com"
-         data-callback="handleGoogleCredentialResponse">
-    </div>
-
-    <!-- Facebook Login Button -->
     <fb:login-button scope="public_profile,email" onlogin="checkLoginState();"></fb:login-button>
 
     <hr />
@@ -53,15 +38,15 @@
             <option value="{{ server.id }}">{{ server.name }}</option>
         {% endfor %}
     </select>
-    <br>
+    <br><br>
 
     <label for="size-input">Розмір файлу (МБ) для тесту:</label>
     <input type="number" id="size-input" value="1" min="1" max="100" />
-    <br>
+    <br><br>
 
     <label for="ttl-input">Час життя результату (секунд):</label>
     <input type="number" id="ttl-input" value="3600" min="60" />
-    <br>
+    <br><br>
 
     <button onclick="startTest()">Почати тест</button>
     <button onclick="startTestRandom()">Тест на випадковому сервері</button>
@@ -72,12 +57,12 @@
     <h2>Статистика</h2>
     <pre id="stats-area">Статистика недоступна.</pre>
 
-    <h2>Кабінет користувача</h2>
-    <button onclick="window.location.href='/cabinet'">Перейти до кабінету</button>
+    <h1>Тест швидкості Інтернету</h1>
+    <button onclick="window.location.href='/cabinet'">Кабінет користувача</button>
 
     <h2>Історія тестів (в межах сесії):</h2>
     <div id="history-area"></div>
 
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
 </html>
-
