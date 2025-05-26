@@ -3,11 +3,106 @@
 <head>
     <meta charset="UTF-8" />
     <title>Кабінет користувача</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <style>
-        table { border-collapse: collapse; width: 100%; }
-        th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
-        th { background: #eee; }
-        button { margin-top: 10px; }
+        body {
+            margin: 0;
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            color: #fff;
+            text-align: center;
+            padding: 20px;
+        }
+
+        h1 {
+            margin: 20px;
+            font-size: 2.5rem;
+            text-shadow: 0 0 10px #00f0ff;
+        }
+
+        button {
+            background: #00f0ff;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-size: 1rem;
+            margin: 20px 0;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+            button:hover {
+                background: #0ff;
+            }
+
+        table {
+            border-collapse: collapse;
+            width: 95%;
+            margin: 20px auto;
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(5px);
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 12px;
+            border: 1px solid rgba(255,255,255,0.1);
+            text-align: left;
+        }
+
+        th {
+            background: rgba(0,240,255,0.2);
+            color: #fff;
+        }
+
+        tr:nth-child(even) {
+            background: rgba(255,255,255,0.03);
+        }
+
+        a {
+            color: #0ff;
+            text-decoration: none;
+        }
+
+        .wave {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            z-index: -1;
+        }
+
+        @media(max-width: 600px) {
+            table, thead, tbody, tr, td, th {
+                display: block;
+            }
+
+            thead {
+                display: none;
+            }
+
+            tr {
+                margin-bottom: 20px;
+                border-bottom: 2px solid rgba(0,240,255,0.2);
+            }
+
+            td {
+                text-align: right;
+                padding-left: 50%;
+                position: relative;
+            }
+
+                td::before {
+                    content: attr(data-label);
+                    position: absolute;
+                    left: 10px;
+                    top: 12px;
+                    font-weight: bold;
+                    color: #0ff;
+                    text-align: left;
+                }
+        }
     </style>
 </head>
 <body>
@@ -33,15 +128,15 @@
         <tbody>
             {% for test in tests %}
             <tr>
-                <td>{{ test.id }}</td>
-                <td>{{ test.server_id }}</td>
-                <td>{{ test.upload }}</td>
-                <td>{{ test.download }}</td>
-                <td>{{ test.upload_time }}</td>
-                <td>{{ test.download_time }}</td>
-                <td>{{ test.created_at }}</td>
-                <td>{{ test.expires_at }}</td>
-                <td><a href="{{ url_for('view_result', test_id=test.id) }}" target="_blank">Деталі</a></td>
+                <td data-label="ID">{{ test.id }}</td>
+                <td data-label="Сервер">{{ test.server_id }}</td>
+                <td data-label="Upload">{{ test.upload }}</td>
+                <td data-label="Download">{{ test.download }}</td>
+                <td data-label="Upload час">{{ test.upload_time }}</td>
+                <td data-label="Download час">{{ test.download_time }}</td>
+                <td data-label="Створено">{{ test.created_at }}</td>
+                <td data-label="Діє до">{{ test.expires_at }}</td>
+                <td data-label="Переглянути"><a href="{{ url_for('view_result', test_id=test.id) }}" target="_blank">Деталі</a></td>
             </tr>
             {% endfor %}
         </tbody>
@@ -49,6 +144,10 @@
     {% else %}
     <p>Немає доступних результатів тестів.</p>
     {% endif %}
+
+    <svg class="wave" viewBox="0 0 1440 320">
+        <path fill="#00f0ff" fill-opacity="0.3"
+              d="M0,160L40,170C80,180,160,200,240,197.3C320,195,400,169,480,176C560,183,640,225,720,240C800,255,880,245,960,213.3C1040,182,1120,128,1200,117.3C1280,107,1360,139,1400,154.7L1440,170L1440,320L0,320Z"></path>
+    </svg>
 </body>
 </html>
-

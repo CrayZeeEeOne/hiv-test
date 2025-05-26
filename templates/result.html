@@ -3,49 +3,123 @@
 <head>
     <meta charset="UTF-8" />
     <title>Результат тесту швидкості</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <style>
         body {
-            font-family: Arial, sans-serif;
+            margin: 0;
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .card {
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(12px);
+            padding: 30px;
+            border-radius: 20px;
             max-width: 500px;
-            margin: 40px auto;
-            padding: 10px;
-            background: #f9f9f9;
-            border-radius: 8px;
-            box-shadow: 0 0 8px rgba(0,0,0,0.1);
-        }
-        h1 {
+            width: 100%;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
             text-align: center;
-            color: #333;
-            margin-bottom: 30px;
         }
+
+        h1 {
+            margin-bottom: 20px;
+            font-size: 2rem;
+            text-shadow: 0 0 10px #00f0ff;
+        }
+
         dl {
             display: grid;
             grid-template-columns: max-content 1fr;
-            gap: 10px 20px;
+            gap: 10px 15px;
+            text-align: left;
         }
+
         dt {
             font-weight: bold;
-            color: #555;
+            color: #0ff;
         }
+
         dd {
             margin: 0;
-            color: #222;
+            color: #fff;
+        }
+
+        button {
+            background: #00f0ff;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-size: 1rem;
+            margin-top: 20px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+            button:hover {
+                background: #0ff;
+            }
+
+        .wave {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            z-index: -1;
+        }
+
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 1.7rem;
+            }
+
+            dl {
+                grid-template-columns: 1fr;
+            }
+
+            dt {
+                margin-top: 10px;
+            }
         }
     </style>
 </head>
 <body>
-    <h1>Результат тесту швидкості</h1>
-    <dl>
-        <dt>ID:</dt><dd>{{ result.id }}</dd>
-        <dt>Сервер:</dt><dd>{{ result.server_id }}</dd>
-        <dt>Завантаження (Download):</dt><dd>{{ "%.2f"|format(result.download) }} Mbps</dd>
-        <dt>Час завантаження:</dt><dd>{{ "%.4f"|format(result.download_time) }} с</dd>
-        <dt>Відвантаження (Upload):</dt><dd>{{ "%.2f"|format(result.upload) }} Mbps</dd>
-        <dt>Час відвантаження:</dt><dd>{{ "%.4f"|format(result.upload_time) }} с</dd>
-        <dt>Створено:</dt><dd>{{ result.created_at }}</dd>
-        <dt>Термін дії до:</dt><dd>{{ result.expires_at }}</dd>
-        <dt>ID користувача:</dt><dd>{{ result.user_id }}</dd>
-    </dl>
+
+    <div class="card">
+        <h1>Результат тесту швидкості</h1>
+        <dl>
+            <dt>ID:</dt>
+            <dd>{{ result.id }}</dd>
+            <dt>Сервер:</dt>
+            <dd>{{ result.server_id }}</dd>
+            <dt>Завантаження (Download):</dt>
+            <dd>{{ "%.2f"|format(result.download) }} Mbps</dd>
+            <dt>Час завантаження:</dt>
+            <dd>{{ "%.4f"|format(result.download_time) }} с</dd>
+            <dt>Відвантаження (Upload):</dt>
+            <dd>{{ "%.2f"|format(result.upload) }} Mbps</dd>
+            <dt>Час відвантаження:</dt>
+            <dd>{{ "%.4f"|format(result.upload_time) }} с</dd>
+            <dt>Створено:</dt>
+            <dd>{{ result.created_at }}</dd>
+            <dt>Термін дії до:</dt>
+            <dd>{{ result.expires_at }}</dd>
+            <dt>ID користувача:</dt>
+            <dd>{{ result.user_id }}</dd>
+        </dl>
+        <button onclick="window.location.href='/'">На головну</button>
+    </div>
+
+    <svg class="wave" viewBox="0 0 1440 320">
+        <path fill="#00f0ff" fill-opacity="0.3"
+              d="M0,160L40,170C80,180,160,200,240,197.3C320,195,400,169,480,176C560,183,640,225,720,240C800,255,880,245,960,213.3C1040,182,1120,128,1200,117.3C1280,107,1360,139,1400,154.7L1440,170L1440,320L0,320Z"></path>
+    </svg>
+
 </body>
 </html>
-
