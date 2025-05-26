@@ -4,7 +4,8 @@ https://www.python.org/downloads/
 Linux (Debian/Ubuntu)
 ```sudo apt update
 sudo apt install python3 python3-pip
-
+```
+```
 git clone https://github.com/CrayZeeEeOne/hiv-test.git
 cd hiv-test
 
