@@ -30,9 +30,10 @@
             flex-direction: column;
             gap: 20px;
             width: 280px;
+            margin-top: 20px;
         }
 
-        button {
+        button, .custom-button {
             padding: 12px 20px;
             font-size: 1.2rem;
             border-radius: 8px;
@@ -44,29 +45,22 @@
             align-items: center;
             justify-content: center;
             gap: 10px;
-        }
-
-        button.google {
-            background-color: #4285f4;
             color: white;
-        }
-        button.google:hover {
-            background-color: #357ae8;
         }
 
         button.facebook {
             background-color: #1877f2;
-            color: white;
         }
         button.facebook:hover {
             background-color: #155db2;
         }
 
-        button.home {
+        .btn-home {
             background-color: #444;
-            color: white;
+            margin-top: 40px;
+            width: 280px;
         }
-        button.home:hover {
+        .btn-home:hover {
             background-color: #222;
         }
 
@@ -76,61 +70,60 @@
             min-height: 1.2em;
         }
     </style>
+
+    <!-- Google Platform Library -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+
+    <!-- Facebook SDK -->
+    <div id="fb-root"></div>
+    <script async defer crossorigin="anonymous"
+            src="https://connect.facebook.net/uk_UA/sdk.js"></script>
+    <script>
+        window.fbAsyncInit = function () {
+            FB.init({
+                appId: '10078966155483125',  // Замінити на свій App ID
+                cookie: true,
+                xfbml: false,
+                version: 'v18.0'
+            });
+        };
+    </script>
 </head>
 <body>
 
     <h1>Вхід через соціальні мережі</h1>
 
     <div class="login-buttons">
-        <button class="google" id="googleSignInBtn">
-            <img src="https://cdn-icons-png.flaticon.com/512/281/281764.png" alt="Google" width="20" />
-            Увійти через Google
-        </button>
 
+        <!-- Google кнопка (буде відрендерена автоматично) -->
+        <div id="g_id_onload"
+             data-client_id="161637199681-cj1eqhcbbdur3rbmikk92uk7b0rlrc5p.apps.googleusercontent.com"
+             data-callback="handleGoogleCredentialResponse"
+             data-auto_prompt="false">
+        </div>
+        <div class="g_id_signin"></div>
+
+        <!-- Facebook кнопка -->
         <button class="facebook" id="fbLoginBtn">
             <img src="https://cdn-icons-png.flaticon.com/512/124/124010.png" alt="Facebook" width="20" />
             Увійти через Facebook
         </button>
-
-        <button class="home" id="goHomeBtn">
-            На головну
-        </button>
     </div>
+
+    <!-- Кнопка "На головну" -->
+    <button class="btn-home" id="btnHome">На головну</button>
 
     <div id="status"></div>
 
-    <!-- Google Identity Services -->
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
-
-    <!-- Facebook SDK -->
     <script>
-        window.fbAsyncInit = function() {
-            FB.init({
-                appId      : '10078966155483125',  // Замінити на свій App ID
-                cookie     : true,
-                xfbml      : false,
-                version    : 'v16.0'
-            });
-        };
-
-        (function(d, s, id){
-           var js, fjs = d.getElementsByTagName(s)[0];
-           if (d.getElementById(id)) {return;}
-           js = d.createElement(s); js.id = id;
-           js.src = "https://connect.facebook.net/uk_UA/sdk.js";
-           fjs.parentNode.insertBefore(js, fjs);
-         }(document, 'script', 'facebook-jssdk'));
-    </script>
-
-    <script>
-        // Facebook Login обробник
+        // Обробник Facebook Login
         document.getElementById('fbLoginBtn').onclick = function() {
             FB.login(function(response) {
                 if (response.status === 'connected') {
                     FB.api('/me', {fields: 'name,email'}, function(userData) {
                         document.getElementById('status').textContent = `Привіт, ${userData.name}! Успішний вхід через Facebook.`;
                         // Редірект після успішного входу
-                        window.location.href = '/';  // Змінити URL якщо потрібно
+                        setTimeout(() => window.location.href = '/', 1500);
                     });
                 } else {
                     document.getElementById('status').textContent = 'Вхід через Facebook скасовано або не вдалий.';
@@ -138,35 +131,21 @@
             }, {scope: 'public_profile,email'});
         };
 
-        // Google Sign-In callback (новий GSI)
-        function handleCredentialResponse(response) {
+        // Обробник Google Credential Response
+        function handleGoogleCredentialResponse(response) {
             try {
                 const payload = JSON.parse(atob(response.credential.split('.')[1]));
-                document.getElementById('status').textContent = `Привіт, ${payload.name}! Успішний вхід через Google!`;
+                document.getElementById('status').textContent = `Привіт, ${payload.name}! Успішний вхід через Google.`;
                 // Редірект після успішного входу
-                setTimeout(() => {
-                    window.location.href = '/';  // Змінити URL якщо потрібно
-                }, 1000); // Затримка щоб побачити повідомлення
-            } catch(e) {
-                document.getElementById('status').textContent = 'Помилка обробки даних Google.';
+                setTimeout(() => window.location.href = '/', 1500);
+            } catch (e) {
+                document.getElementById('status').textContent = 'Помилка входу через Google.';
             }
         }
 
-        window.onload = function () {
-            google.accounts.id.initialize({
-                client_id: '161637199681-cj1eqhcbbdur3rbmikk92uk7b0rlrc5p.apps.googleusercontent.com', // Замінити на свій Client ID
-                callback: handleCredentialResponse
-            });
-
-            // Викликаємо вручну One Tap або вхід при кліку на кнопку
-            document.getElementById('googleSignInBtn').addEventListener('click', () => {
-                google.accounts.id.prompt();
-            });
-        };
-
         // Кнопка "На головну"
-        document.getElementById('goHomeBtn').onclick = function() {
-            window.location.href = '/';  // Змінити URL якщо потрібно
+        document.getElementById('btnHome').onclick = function() {
+            window.location.href = '/';
         };
     </script>
 
