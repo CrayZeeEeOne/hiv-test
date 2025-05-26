@@ -284,60 +284,48 @@ def view_result(test_id):
 
 @app.route('/cabinet')
 def cabinet():
-    # Перевірка авторизації з редіректом на логін
-    if 'user_id' not in session:
-        return redirect(url_for('login_page', next=request.url))
-
-    user_id = session['user_id']
-
-    # Додаткова перевірка для захисту від невалідних user_id
-    if not isinstance(user_id, str) or not user_id.strip():
-        session.clear()
-        return redirect(url_for('login_page', next=request.url))
-
     try:
+        # Додаткове логування для діагностики
+        app.logger.info(f"Session data: {dict(session)}")
+
+        if 'user_id' not in session:
+            app.logger.warning("Unauthorized access attempt to cabinet")
+            return redirect(url_for('login_page', next=request.url))
+
+        user_id = session['user_id']
+        app.logger.info(f"User {user_id} accessing cabinet")
+
+        if not isinstance(user_id, str) or not user_id.strip():
+            app.logger.error(f"Invalid user_id format: {user_id}")
+            session.clear()
+            return redirect(url_for('login_page', next=request.url))
+
         conn = get_db()
         with conn.cursor() as c:
             now = datetime.utcnow()
+            app.logger.info(f"Executing DB queries for user {user_id}")
 
-            # Оптимізований запит - оновлення + вибірка в одному запиті
+            # Спрощений запит для тестування
             c.execute('''
-                BEGIN;
-                UPDATE speedtests
-                SET user_id = 'expired'
-                WHERE user_id = %s AND expires_at <= %s;
-
-                SELECT
-                    id,
-                    server_id,
-                    upload,
-                    download,
-                    upload_time,
-                    download_time,
-                    created_at,
-                    expires_at
+                SELECT id, server_id, upload, download, upload_time,
+                       download_time, created_at, expires_at
                 FROM speedtests
-                WHERE user_id = %s
+                WHERE user_id = %s AND expires_at > %s
                 ORDER BY created_at DESC
-                LIMIT 100;
-                COMMIT;
-            ''', (user_id, now, user_id))
+                LIMIT 50
+            ''', (user_id, now))
 
-            # Отримуємо тільки результати SELECT (після COMMIT)
             tests = c.fetchall()
-
-            # Якщо використовуєте MySQL, можна спростити до:
-            # c.nextset()  # Пропускаємо результат UPDATE
-            # c.nextset()  # Пропускаємо результат COMMIT
-            # tests = c.fetchall()
+            app.logger.info(f"Found {len(tests)} tests for user {user_id}")
 
         if not tests:
+            app.logger.info(f"No active tests for user {user_id}")
             return render_template('cabinet.html',
-                               tests=None,
-                               message="У вас ще немає результатів тестів",
-                               user_id=user_id)
+                                tests=None,
+                                message="У вас ще немає результатів тестів",
+                                user_id=user_id)
 
-        # Форматуємо дати для кращого відображення
+        # Форматування даних
         for test in tests:
             test['created_at'] = test['created_at'].strftime('%Y-%m-%d %H:%M:%S') if test['created_at'] else 'N/A'
             test['expires_at'] = test['expires_at'].strftime('%Y-%m-%d %H:%M:%S') if test['expires_at'] else 'N/A'
@@ -350,13 +338,12 @@ def cabinet():
         app.logger.error(f"Database error in cabinet: {str(e)}")
         return render_template('error.html',
                            message="Тимчасові проблеми з базою даних",
-                           user_id=user_id), 500
-
+                           user_id=user_id if 'user_id' in session else None), 500
     except Exception as e:
-        app.logger.error(f"Unexpected error in cabinet: {str(e)}")
+        app.logger.error(f"Unexpected error in cabinet: {str(e)}", exc_info=True)
         return render_template('error.html',
                            message="Внутрішня помилка сервера",
-                           user_id=user_id), 500
+                           user_id=user_id if 'user_id' in session else None), 500
 
 @app.route('/stats')
 def stats():
