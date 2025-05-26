@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8" />
+    <title>Кабінет користувача</title>
+    <style>
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+        th { background: #eee; }
+        button { margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <h1>Кабінет користувача</h1>
+    <button onclick="window.location.href='/'">Повернутися на головну</button>
+    <br><br>
+
+    {% if tests %}
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Сервер</th>
+                <th>Upload (Mbps)</th>
+                <th>Download (Mbps)</th>
+                <th>Upload час (с)</th>
+                <th>Download час (с)</th>
+                <th>Дата створення</th>
+                <th>Термін дії до</th>
+                <th>Переглянути</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for test in tests %}
+            <tr>
+                <td>{{ test.id }}</td>
+                <td>{{ test.server_id }}</td>
+                <td>{{ test.upload }}</td>
+                <td>{{ test.download }}</td>
+                <td>{{ test.upload_time }}</td>
+                <td>{{ test.download_time }}</td>
+                <td>{{ test.created_at }}</td>
+                <td>{{ test.expires_at }}</td>
+                <td><a href="{{ url_for('view_result', test_id=test.id) }}" target="_blank">Деталі</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>Немає доступних результатів тестів.</p>
+    {% endif %}
+</body>
+</html>
+

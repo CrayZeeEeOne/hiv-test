@@ -14,15 +14,28 @@ app.secret_key = 'super-secret-key'  # Заміни на безпечний у �
 UPLOAD_FOLDER = 'uploads'
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-# DB config
-DB_CONFIG = {
-    'host': 'czeo.mysql.pythonanywhere-services.com',
-    'user': 'czeo',
-    'password': '123QWEasd_',
-    'database': 'czeo$db',
-    'charset': 'utf8mb4',
-    'cursorclass': pymysql.cursors.DictCursor
-}
+USE_LOCAL = os.environ.get('USE_LOCAL_DB') == '1'
+
+if USE_LOCAL:
+    print("[DB] Використовується локальна база даних")
+    DB_CONFIG = {
+        'host': 'localhost',
+        'user': 'hivuser',
+        'password': 'hivpass123',
+        'database': 'hiv_test',
+        'charset': 'utf8mb4',
+        'cursorclass': pymysql.cursors.DictCursor
+    }
+else:
+    print("[DB] Використовується віддалена база на PythonAnywhere")
+    DB_CONFIG = {
+        'host': 'czeo.mysql.pythonanywhere-services.com',
+        'user': 'czeo',
+        'password': '123QWEasd_',
+        'database': 'czeo$db',
+        'charset': 'utf8mb4',
+        'cursorclass': pymysql.cursors.DictCursor
+    }
 
 GOOGLE_CLIENT_ID = "161637199681-cj1eqhcbbdur3rbmikk92uk7b0rlrc5p.apps.googleusercontent.com"
 
@@ -214,15 +227,45 @@ def view_result(test_id):
     if not row:
         return "Результат не знайдено", 404
 
+    # Перевірка і перетворення expires_at
     expires_at = row['expires_at']
     if isinstance(expires_at, str):
-        expires_at = datetime.strptime(expires_at, '%Y-%m-%d %H:%M:%S')
+        expires_at_dt = datetime.strptime(expires_at, '%Y-%m-%d %H:%M:%S')
+    else:
+        expires_at_dt = expires_at
+
     now = datetime.utcnow()
 
-    if expires_at <= now:
+    if expires_at_dt <= now:
         return "Термін дії результату закінчився.", 403
 
-    return jsonify(row)
+    # Переконатися, що expires_at і created_at у форматі рядка для шаблону
+    if not isinstance(row['created_at'], str):
+        row['created_at'] = row['created_at'].strftime('%Y-%m-%d %H:%M:%S')
+    if not isinstance(row['expires_at'], str):
+        row['expires_at'] = expires_at_dt.strftime('%Y-%m-%d %H:%M:%S')
+
+    # Віддати html сторінку з передачею результату
+    return render_template('result.html', result=row)
+
+@app.route('/cabinet')
+def cabinet():
+    user_id = session.get('user_id')
+    if not user_id:
+        return "Будь ласка, увійдіть, щоб бачити кабінет користувача.", 401
+
+    conn = get_db()
+    with conn.cursor() as c:
+        now = datetime.utcnow()
+        c.execute('''
+            SELECT id, server_id, upload, download, upload_time, download_time, created_at, expires_at
+            FROM speedtests
+            WHERE user_id = %s AND expires_at > %s
+            ORDER BY created_at DESC
+        ''', (user_id, now))
+        tests = c.fetchall()
+
+    return render_template('cabinet.html', tests=tests)
 
 @app.route('/stats')
 def stats():
