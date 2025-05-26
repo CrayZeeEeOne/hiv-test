@@ -96,31 +96,119 @@
             }
         }
     </style>
+    <!-- Google Identity Services SDK -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <!-- Facebook SDK -->
+    <script async defer crossorigin="anonymous" src="https://connect.facebook.net/uk_UA/sdk.js#xfbml=1&version=v18.0&appId=YOUR_FACEBOOK_APP_ID&autoLogAppEvents=1" nonce="YOUR_NONCE"></script>
 </head>
 <body>
     <div class="login-card">
         <h1>Авторизація</h1>
 
         <div class="social-buttons">
-            <button class="social-btn google-btn" onclick="googleLogin()">
-                <img src="https://cdn-icons-png.flaticon.com/512/281/281764.png" alt="Google">
-                Google
-            </button>
-            <button class="social-btn facebook-btn" onclick="facebookLogin()">
-                <img src="https://cdn-icons-png.flaticon.com/512/124/124010.png" alt="Facebook">
-                Facebook
-            </button>
+            <!-- Google Login Button -->
+            <div id="g_id_onload"
+                 data-client_id="YOUR_GOOGLE_CLIENT_ID"
+                 data-context="signin"
+                 data-ux_mode="popup"
+                 data-callback="handleGoogleCredentialResponse"
+                 data-auto_prompt="false">
+            </div>
+            <div class="g_id_signin social-btn google-btn"
+                 data-type="standard"
+                 data-shape="rectangular"
+                 data-theme="filled_blue"
+                 data-text="signin_with"
+                 data-size="large"
+                 data-logo_alignment="left">
+            </div>
+
+            <!-- Facebook Login Button -->
+            <div class="fb-login-button social-btn facebook-btn"
+                 data-width=""
+                 data-size="large"
+                 data-button-type="continue_with"
+                 data-layout="default"
+                 data-auto-logout-link="false"
+                 data-use-continue-as="false"
+                 onlogin="checkLoginState();">
+            </div>
         </div>
 
         <button class="main-btn" onclick="window.location.href='/'">⬅️ На головну</button>
     </div>
 
     <script>
-        function googleLogin() {
-            alert("Google авторизація — підключення.");
+        // Ініціалізація Facebook SDK
+        window.fbAsyncInit = function() {
+            FB.init({
+                appId: 'YOUR_FACEBOOK_APP_ID',
+                cookie: true,
+                xfbml: true,
+                version: 'v18.0'
+            });
+        };
+
+        // Обробник відповіді Google
+        function handleGoogleCredentialResponse(response) {
+            fetch('/login/google', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ credential: response.credential })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message) {
+                    window.location.href = data.redirect || '/cabinet';
+                } else {
+                    alert(data.error || 'Помилка авторизації через Google');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Сталася помилка при авторизації');
+            });
         }
+
+        // Перевірка стану входу Facebook
+        function checkLoginState() {
+            FB.getLoginStatus(function(response) {
+                if (response.status === 'connected') {
+                    const accessToken = response.authResponse.accessToken;
+                    const userID = response.authResponse.userID;
+
+                    fetch('/login/facebook', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({ accessToken, userID })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.message) {
+                            window.location.href = data.redirect || '/cabinet';
+                        } else {
+                            alert(data.error || 'Помилка авторизації через Facebook');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Сталася помилка при авторизації');
+                    });
+                } else {
+                    console.log('Користувач не авторизований через Facebook');
+                }
+            });
+        }
+
+        // Додаткові функції для кнопок (якщо потрібно)
+        function googleLogin() {
+            // Викликаємо клік на офіційній кнопці Google
+            document.querySelector('.g_id_signin').click();
+        }
+
         function facebookLogin() {
-            alert("Facebook авторизація — підключення.");
+            // Викликаємо клік на офіційній кнопці Facebook
+            document.querySelector('.fb-login-button').click();
         }
     </script>
 </body>
