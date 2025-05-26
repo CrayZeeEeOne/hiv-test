@@ -161,6 +161,39 @@ function handleGoogleCredentialResponse(response) {
     });
 }
 
+// Функція для Google Login
+function googleLogin() {
+    google.accounts.id.initialize({
+        client_id: 'ВАШ_GOOGLE_CLIENT_ID',
+        callback: handleGoogleResponse
+    });
+    google.accounts.id.prompt();
+}
+
+// Функція для Facebook Login
+function facebookLogin() {
+    FB.login(function(response) {
+        if (response.authResponse) {
+            fetch('/auth/facebook', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    accessToken: response.authResponse.accessToken,
+                    userID: response.authResponse.userID
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.href = '/cabinet';
+                } else {
+                    alert('Помилка авторизації: ' + data.error);
+                }
+            });
+        }
+    }, {scope: 'public_profile,email'});
+}
+
 function logout() {
     fetch('/logout', {
         method: 'POST'
