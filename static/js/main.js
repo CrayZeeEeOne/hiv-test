@@ -170,29 +170,38 @@ function googleLogin() {
     google.accounts.id.prompt();
 }
 
-// Функція для Facebook Login
 function facebookLogin() {
     FB.login(function(response) {
         if (response.authResponse) {
-            fetch('/auth/facebook', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({
-                    accessToken: response.authResponse.accessToken,
-                    userID: response.authResponse.userID
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    window.location.href = '/cabinet';
-                } else {
-                    alert('Помилка авторизації: ' + data.error);
-                }
-            });
+            // Якщо логін успішний, перевіримо статус та дістанемо інформацію
+            checkLoginState();
+        } else {
+            alert('Facebook login cancelled or failed.');
         }
     }, {scope: 'public_profile,email'});
 }
+
+function checkLoginState() {
+    FB.getLoginStatus(function(response) {
+        console.log('Facebook login status:', response);
+        if (response.status === 'connected') {
+            const accessToken = response.authResponse.accessToken;
+            console.log('Facebook Access Token:', accessToken);
+
+            // Тут ти можеш зробити запит на свій сервер,
+            // або показати повідомлення, або редірект:
+
+            alert('Успішний вхід через Facebook!');
+
+            // Наприклад, редірект:
+            // window.location.href = '/profile';
+
+        } else {
+            alert('Не вдалось авторизуватись через Facebook.');
+        }
+    });
+}
+
 
 function logout() {
     fetch('/logout', {
