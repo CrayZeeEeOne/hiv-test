@@ -257,12 +257,22 @@ def cabinet():
     conn = get_db()
     with conn.cursor() as c:
         now = datetime.utcnow()
+        
+        # Позначаємо протерміновані результати як "expired"
+        c.execute('''
+            UPDATE speedtests
+            SET user_id = 'expired'
+            WHERE user_id = %s AND expires_at <= %s
+        ''', (user_id, now))
+        conn.commit()
+        
+        # Отримуємо тільки активні результати для поточного користувача
         c.execute('''
             SELECT id, server_id, upload, download, upload_time, download_time, created_at, expires_at
             FROM speedtests
-            WHERE user_id = %s AND expires_at > %s
+            WHERE user_id = %s
             ORDER BY created_at DESC
-        ''', (user_id, now))
+        ''', (user_id,))
         tests = c.fetchall()
 
     return render_template('cabinet.html', tests=tests)
