@@ -7,10 +7,22 @@
     <!-- Підключення Google SDK -->
     <script src="https://accounts.google.com/gsi/client" async defer></script>
 
-    <!-- Підключення Facebook SDK -->
-    <div id="fb-root"></div>
-    <script async defer crossorigin="anonymous"
-            src="https://connect.facebook.net/uk_UA/sdk.js"></script>
+    <!-- Facebook SDK -->
+<div id="fb-root"></div>
+<script async defer crossorigin="anonymous"
+        src="https://connect.facebook.net/uk_UA/sdk.js"></script>
+<script>
+  window.fbAsyncInit = function() {
+    FB.init({
+      appId      : '10078966155483125',  // ← сюди встав свій реальний App ID
+      cookie     : true,
+      xfbml      : true,
+      version    : 'v18.0'
+    });
+
+    FB.AppEvents.logPageView();
+  };
+</script>
 
     <!-- Підключення власного JS-файлу -->
     <script src="js/main.js" defer></script>
