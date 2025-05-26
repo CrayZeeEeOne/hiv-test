@@ -99,8 +99,8 @@
 
     <div id="status"></div>
 
-    <!-- Завантажуємо Google API для класичного входу -->
-    <script src="https://apis.google.com/js/platform.js" async defer></script>
+    <!-- Google Identity Services -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
 
     <!-- Facebook SDK -->
     <script>
@@ -138,38 +138,35 @@
             }, {scope: 'public_profile,email'});
         };
 
-        // Google OAuth2 класичний вхід
-        function onSuccess(googleUser) {
-            const profile = googleUser.getBasicProfile();
-            document.getElementById('status').textContent = `Привіт, ${profile.getName()}! Успішний вхід через Google.`;
-            // Редірект після успішного входу
-            window.location.href = '/';  // Змінити URL якщо потрібно
+        // Google Sign-In callback (новий GSI)
+        function handleCredentialResponse(response) {
+            try {
+                const payload = JSON.parse(atob(response.credential.split('.')[1]));
+                document.getElementById('status').textContent = `Привіт, ${payload.name}! Успішний вхід через Google!`;
+                // Редірект після успішного входу
+                setTimeout(() => {
+                    window.location.href = '/';  // Змінити URL якщо потрібно
+                }, 1000); // Затримка щоб побачити повідомлення
+            } catch(e) {
+                document.getElementById('status').textContent = 'Помилка обробки даних Google.';
+            }
         }
 
-        function onFailure(error) {
-            console.error(error);
-            document.getElementById('status').textContent = 'Помилка входу через Google.';
-        }
-
-        function initGoogleSignIn() {
-            gapi.load('auth2', function() {
-                const auth2 = gapi.auth2.init({
-                    client_id: '161637199681-cj1eqhcbbdur3rbmikk92uk7b0rlrc5p.apps.googleusercontent.com' // Замінити на свій Client ID
-                });
-
-                document.getElementById('googleSignInBtn').addEventListener('click', function() {
-                    auth2.signIn().then(onSuccess, onFailure);
-                });
+        window.onload = function () {
+            google.accounts.id.initialize({
+                client_id: '161637199681-cj1eqhcbbdur3rbmikk92uk7b0rlrc5p.apps.googleusercontent.com', // Замінити на свій Client ID
+                callback: handleCredentialResponse
             });
-        }
+
+            // Викликаємо вручну One Tap або вхід при кліку на кнопку
+            document.getElementById('googleSignInBtn').addEventListener('click', () => {
+                google.accounts.id.prompt();
+            });
+        };
 
         // Кнопка "На головну"
         document.getElementById('goHomeBtn').onclick = function() {
             window.location.href = '/';  // Змінити URL якщо потрібно
-        };
-
-        window.onload = function() {
-            initGoogleSignIn();
         };
     </script>
 
