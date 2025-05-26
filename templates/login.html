@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Авторизація</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .login-card {
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(12px);
+            padding: 30px;
+            border-radius: 20px;
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 0 20px rgba(0,240,255,0.15);
+        }
+        h1 {
+            margin-bottom: 20px;
+            font-size: 2rem;
+            text-shadow: 0 0 10px #00f0ff;
+        }
+        button {
+            background: #00f0ff;
+            border: none;
+            padding: 14px 26px;
+            border-radius: 12px;
+            font-size: 1rem;
+            margin: 12px 0;
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+        button:hover {
+            background: #0ff;
+            transform: scale(1.05);
+            box-shadow: 0 0 12px rgba(0, 240, 255, 0.5);
+        }
+        button:active {
+            transform: scale(0.95);
+        }
+        @media (max-width: 600px) {
+            .login-card {
+                padding: 20px;
+            }
+            h1 {
+                font-size: 1.7rem;
+            }
+            button {
+                width: 90%;
+            }
+        }
+    </style>
+
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+
+    <!-- Facebook SDK -->
+    <div id="fb-root"></div>
+    <script async defer crossorigin="anonymous"
+            src="https://connect.facebook.net/uk_UA/sdk.js"></script>
+    <script>
+        window.fbAsyncInit = function () {
+            FB.init({
+                appId: '10078966155483125',
+                cookie: true,
+                xfbml: true,
+                version: 'v18.0'
+            });
+            FB.AppEvents.logPageView();
+        };
+    </script>
+
+    <!-- Твій основний JS -->
+    <script src="js/main.js" defer></script>
+
+</head>
+<body>
+    <!-- Replace the content inside login-card div with: -->
+<div class="login-card">
+    <h1>Авторизація</h1>
+    <div id="g_id_onload"
+         data-client_id="161637199681-cj1eqhcbbdur3rbmikk92uk7b0rlrc5p.apps.googleusercontent.com"
+         data-callback="handleGoogleCredentialResponse">
+    </div>
+    <div class="g_id_signin" data-type="standard"></div>
+
+    <fb:login-button scope="public_profile,email" onlogin="checkLoginState();"></fb:login-button>
+
+    <button onclick="window.location.href='/'">⬅️ На головну</button>
+</div>
+</body>
+</html>

@@ -51,26 +51,18 @@
             font-size: 1rem;
             margin: 10px 5px;
             cursor: pointer;
-            transition: 0.3s;
+            transition: all 0.25s ease;
+            transform: scale(1);
         }
 
-            button:hover {
-                background: #0ff;
-            }
-
-        pre {
-            text-align: left;
-            background: rgba(255,255,255,0.08);
-            padding: 12px;
-            border-radius: 10px;
-            overflow-x: auto;
-            width: 90%;
-            margin: 10px auto;
+        button:hover {
+            background: #0ff;
+            transform: scale(1.05);
+            box-shadow: 0 0 12px rgba(0, 240, 255, 0.5);
         }
 
-        hr {
-            border: 1px solid rgba(255,255,255,0.1);
-            margin: 20px 0;
+        button:active {
+            transform: scale(0.95);
         }
 
         .wave {
@@ -79,6 +71,52 @@
             left: 0;
             width: 100%;
             z-index: -1;
+        }
+
+        .social-login, .card-block {
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(8px);
+            padding: 20px;
+            border-radius: 20px;
+            margin: 20px auto;
+            max-width: 800px;
+            box-shadow: 0 0 15px rgba(0,240,255,0.15);
+            transition: 0.3s ease;
+        }
+
+        .social-login h2, .card-block h2 {
+            margin-bottom: 15px;
+            color: #0ff;
+            text-shadow: 0 0 8px #0ff;
+        }
+
+        .social-login div, .social-login fb\\:login-button {
+            margin: 10px 0;
+        }
+
+        .g_id_signin, fb\\:login-button {
+            transition: 0.3s ease;
+        }
+
+        .g_id_signin:hover, fb\\:login-button:hover {
+            transform: scale(1.05);
+        }
+
+        .card-block pre {
+            text-align: left;
+            background: rgba(255,255,255,0.08);
+            padding: 12px;
+            border-radius: 10px;
+            overflow-x: auto;
+            width: 90%;
+            margin: 10px auto;
+            color: #fff;
+        }
+
+        .card-block div {
+            padding: 10px;
+            color: #ccc;
+            text-align: left;
         }
 
         @media (max-width: 600px) {
@@ -93,49 +131,18 @@
             h2 {
                 font-size: 1.3rem;
             }
+
+            .social-login, .card-block {
+                padding: 15px;
+            }
         }
     </style>
-
-    <!-- Google SDK -->
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
-
-    <!-- Facebook SDK -->
-    <div id="fb-root"></div>
-    <script async defer crossorigin="anonymous"
-            src="https://connect.facebook.net/uk_UA/sdk.js"></script>
-    <script>
-        window.fbAsyncInit = function () {
-            FB.init({
-                appId: '10078966155483125',
-                cookie: true,
-                xfbml: true,
-                version: 'v18.0'
-            });
-            FB.AppEvents.logPageView();
-        };
-    </script>
-
-    <!-- Твій основний JS -->
     <script src="js/main.js" defer></script>
 </head>
 
 <body>
 
     <h1>Тест швидкості Інтернету</h1>
-
-    <h2>Вхід через соціальні мережі</h2>
-
-    <div id="g_id_onload"
-         data-client_id="161637199681-cj1eqhcbbdur3rbmikk92uk7b0rlrc5p.apps.googleusercontent.com"
-         data-callback="handleGoogleCredentialResponse">
-    </div>
-    <div class="g_id_signin" data-type="standard"></div>
-
-    <br />
-
-    <fb:login-button scope="public_profile,email" onlogin="checkLoginState();"></fb:login-button>
-
-    <hr />
 
     <label for="server-select">Оберіть сервер:</label>
     <select id="server-select">
@@ -153,16 +160,27 @@
     <button onclick="startTest()">Почати тест</button>
     <button onclick="startTestRandom()">Тест на випадковому сервері</button>
 
-    <h2>Результат:</h2>
-    <pre id="result-area">Натисніть "Почати тест" для запуску.</pre>
+    <div class="card-block">
+        <h2>Результат:</h2>
+        <pre id="result-area">Натисніть "Почати тест" для запуску.</pre>
+    </div>
 
-    <h2>Статистика</h2>
-    <pre id="stats-area">Статистика недоступна.</pre>
+    <div class="card-block">
+        <h2>Статистика</h2>
+        <pre id="stats-area">Статистика недоступна.</pre>
+    </div>
 
+    {% if logged_in %}
     <button onclick="window.location.href='/cabinet'">Кабінет користувача</button>
+    <button onclick="logout()">Вийти</button>
+    {% else %}
+    <button onclick="window.location.href='/login'">Увійти</button>
+    {% endif %}
 
-    <h2>Історія тестів (в межах сесії):</h2>
-    <div id="history-area"></div>
+    <div class="card-block">
+        <h2>Історія тестів (в межах сесії):</h2>
+        <div id="history-area">Немає записів.</div>
+    </div>
 
     <svg class="wave" viewBox="0 0 1440 320">
         <path fill="#00f0ff" fill-opacity="0.3"

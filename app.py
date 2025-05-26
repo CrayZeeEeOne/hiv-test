@@ -98,17 +98,42 @@ def get_servers():
 @app.route('/')
 def index():
     servers = get_servers()
-    return render_template('index.html', servers=servers)
+    logged_in = 'user_id' in session
+    user_id = session.get('user_id', None)
+    return render_template('index.html',
+                         servers=servers,
+                         logged_in=logged_in,
+                         user_id=user_id)
 
-@app.route('/login', methods=['POST'])
+@app.route('/login', methods=['GET', 'POST'])
 def login():
-    data = request.get_json()
-    user_id = data.get('user_id')
-    if user_id:
+    if request.method == 'GET':
+        # Віддаємо HTML сторінку для GET-запитів
+        return render_template('login.html')
+
+    elif request.method == 'POST':
+        # Обробка POST-запиту для логіну
+        data = request.get_json()
+        if not data:
+            return jsonify({'error': 'Необхідно надати JSON дані'}), 400
+
+        user_id = data.get('user_id')
+        if not user_id:
+            return jsonify({'error': 'Потрібно вказати user_id'}), 400
+
+        # Додаткові перевірки (приклад)
+        if not isinstance(user_id, str) or len(user_id) < 3:
+            return jsonify({'error': 'Невірний формат user_id'}), 400
+
+        # Зберігаємо в сесії
         session['user_id'] = user_id
-        return jsonify({'message': f'Успішний вхід як {user_id}'})
-    else:
-        return jsonify({'error': 'Потрібно вказати user_id'}), 400
+        session['logged_in_at'] = datetime.utcnow().isoformat()
+
+        return jsonify({
+            'message': f'Успішний вхід як {user_id}',
+            'user_id': user_id,
+            'redirect': url_for('cabinet')  # Редірект після логіну
+        })
 
 @app.route('/login/google', methods=['POST'])
 def login_google():
@@ -147,6 +172,15 @@ def login_facebook():
             return jsonify({'error': 'Недійсний токен Facebook'}), 401
     except:
         return jsonify({'error': 'Помилка при перевірці Facebook токена'}), 500
+
+@app.route('/logout', methods=['POST'])
+def logout():
+    # Очищаємо всі дані сесії
+    session.clear()
+    return jsonify({
+        'message': 'Успішний вихід',
+        'redirect': url_for('index')  # Додаємо URL для редіректу
+    })
 
 @app.route('/upload', methods=['POST'])
 def upload():
@@ -250,32 +284,79 @@ def view_result(test_id):
 
 @app.route('/cabinet')
 def cabinet():
-    user_id = session.get('user_id')
-    if not user_id:
-        return "Будь ласка, увійдіть, щоб бачити кабінет користувача.", 401
+    # Перевірка авторизації з редіректом на логін
+    if 'user_id' not in session:
+        return redirect(url_for('login_page', next=request.url))
 
-    conn = get_db()
-    with conn.cursor() as c:
-        now = datetime.utcnow()
-        
-        # Позначаємо протерміновані результати як "expired"
-        c.execute('''
-            UPDATE speedtests
-            SET user_id = 'expired'
-            WHERE user_id = %s AND expires_at <= %s
-        ''', (user_id, now))
-        conn.commit()
-        
-        # Отримуємо тільки активні результати для поточного користувача
-        c.execute('''
-            SELECT id, server_id, upload, download, upload_time, download_time, created_at, expires_at
-            FROM speedtests
-            WHERE user_id = %s
-            ORDER BY created_at DESC
-        ''', (user_id,))
-        tests = c.fetchall()
+    user_id = session['user_id']
 
-    return render_template('cabinet.html', tests=tests)
+    # Додаткова перевірка для захисту від невалідних user_id
+    if not isinstance(user_id, str) or not user_id.strip():
+        session.clear()
+        return redirect(url_for('login_page', next=request.url))
+
+    try:
+        conn = get_db()
+        with conn.cursor() as c:
+            now = datetime.utcnow()
+
+            # Оптимізований запит - оновлення + вибірка в одному запиті
+            c.execute('''
+                BEGIN;
+                UPDATE speedtests
+                SET user_id = 'expired'
+                WHERE user_id = %s AND expires_at <= %s;
+
+                SELECT
+                    id,
+                    server_id,
+                    upload,
+                    download,
+                    upload_time,
+                    download_time,
+                    created_at,
+                    expires_at
+                FROM speedtests
+                WHERE user_id = %s
+                ORDER BY created_at DESC
+                LIMIT 100;
+                COMMIT;
+            ''', (user_id, now, user_id))
+
+            # Отримуємо тільки результати SELECT (після COMMIT)
+            tests = c.fetchall()
+
+            # Якщо використовуєте MySQL, можна спростити до:
+            # c.nextset()  # Пропускаємо результат UPDATE
+            # c.nextset()  # Пропускаємо результат COMMIT
+            # tests = c.fetchall()
+
+        if not tests:
+            return render_template('cabinet.html',
+                               tests=None,
+                               message="У вас ще немає результатів тестів",
+                               user_id=user_id)
+
+        # Форматуємо дати для кращого відображення
+        for test in tests:
+            test['created_at'] = test['created_at'].strftime('%Y-%m-%d %H:%M:%S') if test['created_at'] else 'N/A'
+            test['expires_at'] = test['expires_at'].strftime('%Y-%m-%d %H:%M:%S') if test['expires_at'] else 'N/A'
+
+        return render_template('cabinet.html',
+                            tests=tests,
+                            user_id=user_id)
+
+    except pymysql.Error as e:
+        app.logger.error(f"Database error in cabinet: {str(e)}")
+        return render_template('error.html',
+                           message="Тимчасові проблеми з базою даних",
+                           user_id=user_id), 500
+
+    except Exception as e:
+        app.logger.error(f"Unexpected error in cabinet: {str(e)}")
+        return render_template('error.html',
+                           message="Внутрішня помилка сервера",
+                           user_id=user_id), 500
 
 @app.route('/stats')
 def stats():

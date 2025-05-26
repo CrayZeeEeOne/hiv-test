@@ -161,3 +161,12 @@ function handleGoogleCredentialResponse(response) {
     });
 }
 
+function logout() {
+    fetch('/logout', {
+        method: 'POST'
+    }).then(response => {
+        if (response.ok) {
+            window.location.reload();
+        }
+    });
+}
