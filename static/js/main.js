@@ -209,6 +209,27 @@ function facebookLogin() {
     }, {scope: 'public_profile,email'});
 }
 
+FB.login(function(response) {
+    if (response.authResponse) {
+        fetch('/login/facebook', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ accessToken: response.authResponse.accessToken })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.message) {
+                console.log(data.message);
+                // Оновіть UI, збережіть статус логіну тощо
+            } else if (data.error) {
+                console.error(data.error);
+            }
+        });
+    } else {
+        console.log('Facebook login cancelled or failed');
+    }
+}, { scope: 'public_profile,email' });
+
 
 function logout() {
     fetch('/logout', {
