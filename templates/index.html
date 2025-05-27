@@ -150,28 +150,7 @@
 
     <h1>Тест швидкості Інтернету</h1>
 
-    <h2>Вхід через соціальні мережі</h2>
 
-    <div class="button-group">
-        {% if user_id and user_id != 'guest' %}
-            <button onclick="window.location.href='/cabinet'">Кабінет користувача</button>
-            <button onclick="logout()" class="logout-btn">Вийти</button>
-        {% else %}
-             <div id="g_id_onload"
-         data-client_id="161637199681-cj1eqhcbbdur3rbmikk92uk7b0rlrc5p.apps.googleusercontent.com"
-         data-callback="handleGoogleCredentialResponse">
-    </div>
-    <div class="g_id_signin" data-type="standard"></div>
-
-    <br />
-
-    <fb:login-button scope="public_profile,email" onlogin="checkLoginState();"></fb:login-button>
-
-    <hr />
-        {% endif %}
-    </div>
-
-    <hr />
 
     <label for="server-select">Оберіть сервер:</label>
     <select id="server-select">
@@ -194,6 +173,27 @@
 
     <h2>Статистика</h2>
     <pre id="stats-area">Статистика недоступна.</pre>
+
+    <div class="button-group">
+        {% if user_id and user_id != 'guest' %}
+            <button onclick="window.location.href='/cabinet'">Кабінет користувача</button>
+            <button onclick="logout()" class="logout-btn">Вийти</button>
+        {% else %}
+             <div id="g_id_onload"
+         data-client_id="161637199681-cj1eqhcbbdur3rbmikk92uk7b0rlrc5p.apps.googleusercontent.com"
+         data-callback="handleGoogleCredentialResponse">
+    </div>
+    <div class="g_id_signin" data-type="standard"></div>
+
+    <br />
+
+    <fb:login-button scope="public_profile,email" onlogin="checkLoginState();"></fb:login-button>
+
+    <hr />
+        {% endif %}
+    </div>
+
+    <hr />
 
     <h2>Історія тестів (в межах сесії):</h2>
     <div id="history-area"></div>
