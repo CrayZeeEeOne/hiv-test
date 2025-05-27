@@ -179,35 +179,10 @@ function facebookLogin() {
     FB.login(function(response) {
         if (response.authResponse) {
             FB.api('/me', { fields: 'name,email' }, function(profile) {
-                // Надіслати дані користувача на сервер
-                fetch('/facebook-login', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        id: profile.id,
-                        name: profile.name,
-                        email: profile.email,
-                        accessToken: response.authResponse.accessToken
-                    })
-                })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.success) {
-                        // Наприклад, сховати кнопки входу, показати кабінет
-                        document.getElementById('auth-buttons').style.display = 'none';
-                        document.getElementById('result-area').textContent = 'Успішна авторизація через Facebook!';
-                    } else {
-                        alert('Помилка під час входу: ' + data.message);
-                    }
-                })
-                .catch(err => {
-                    console.error('Помилка авторизації:', err);
-                });
+                console.log('Успішно увійшли як:', profile.name, profile.email);
             });
         } else {
-            console.log('Користувач скасував логін або не авторизувався.');
+            console.log('Користувач скасував авторизацію.');
         }
     }, { scope: 'public_profile,email' });
 }
