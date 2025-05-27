@@ -176,14 +176,37 @@ function googleLogin() {
 }
 
 function facebookLogin() {
-    FB.login(function(response) {
+    FB.login(function (response) {
         if (response.authResponse) {
-            checkLoginState();
+            FB.api('/me', { fields: 'name,email' }, function (userInfo) {
+                // Надсилаємо отриману інформацію на сервер
+                fetch('/auth/facebook', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        accessToken: response.authResponse.accessToken,
+                        userID: response.authResponse.userID,
+                        name: userInfo.name,
+                        email: userInfo.email
+                    })
+                })
+                .then(res => {
+                    if (res.ok) {
+                        // Оновити сторінку після успішної авторизації
+                        location.reload();
+                    } else {
+                        alert('Помилка авторизації через Facebook');
+                    }
+                });
+            });
         } else {
-            alert('Вхід через Facebook скасовано');
+            alert('Авторизацію скасовано або відхилено');
         }
-    }, {scope: 'public_profile,email'});
+    }, { scope: 'email' });
 }
+
 
 function logout() {
     fetch('/logout', {
