@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="uk">
 <head>
-    <meta charset="UTF-8" />
+    <meta charset="UTF-8">
     <title>Кабінет користувача</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <style>
@@ -15,99 +15,64 @@
         }
 
         h1 {
-            margin: 20px 0;
+            margin: 20px;
             font-size: 2.5rem;
             text-shadow: 0 0 10px #00f0ff;
         }
 
-        h2 {
-            margin: 20px 0 10px;
-            font-size: 1.5rem;
-            color: #0ff;
-        }
-
-        label {
-            display: block;
-            margin: 10px 0 5px;
-            font-size: 1rem;
-        }
-
-        input, select {
-            padding: 12px;
-            margin: 5px;
-            border-radius: 10px;
-            border: 1px solid rgba(0, 240, 255, 0.4);
-            font-size: 1rem;
-            width: 250px;
-            max-width: 90%;
-            background: rgba(255, 255, 255, 0.05);
-            color: #fff;
-            transition: all 0.25s ease;
-        }
-
-        input:focus, select:focus {
-            outline: none;
-            border-color: #0ff;
-            box-shadow: 0 0 8px rgba(0, 240, 255, 0.5);
-            background: rgba(255, 255, 255, 0.08);
-        }
-
-        select option {
-            background: #203a43;
-            color: #fff;
-        }
-
-        .fancy-btn {
+        button {
             background: linear-gradient(135deg, #00f0ff, #0ff);
             border: none;
             padding: 14px 26px;
             border-radius: 12px;
             font-size: 1rem;
-            margin: 12px 5px;
+            margin: 20px 5px;
             cursor: pointer;
             color: #000;
             font-weight: bold;
             box-shadow: 0 0 10px rgba(0,240,255,0.4);
-            transition: all 0.4s ease;
+            transition: all 0.3s ease;
             background-size: 200% 200%;
         }
 
-        .fancy-btn:hover {
+        button:hover {
             background-position: right center;
             transform: scale(1.08);
             box-shadow: 0 0 18px rgba(0,240,255,0.7);
         }
 
-        .fancy-btn:active {
+        button:active {
             transform: scale(0.95);
         }
 
-        .card-block {
-            background: rgba(255,255,255,0.05);
-            backdrop-filter: blur(8px);
-            padding: 20px;
-            border-radius: 20px;
+        table {
+            border-collapse: collapse;
+            width: 95%;
             margin: 20px auto;
-            max-width: 800px;
-            box-shadow: 0 0 15px rgba(0,240,255,0.15);
-            transition: 0.3s ease;
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(5px);
+            border-radius: 15px;
+            overflow: hidden;
         }
 
-        .card-block h2 {
-            margin-bottom: 15px;
-            color: #0ff;
-            text-shadow: 0 0 8px #0ff;
-        }
-
-        .card-block pre {
-            text-align: left;
-            background: rgba(255,255,255,0.08);
+        th, td {
             padding: 12px;
-            border-radius: 10px;
-            overflow-x: auto;
-            width: 90%;
-            margin: 10px auto;
+            border: 1px solid rgba(255,255,255,0.1);
+            text-align: left;
+        }
+
+        th {
+            background: rgba(0,240,255,0.2);
             color: #fff;
+        }
+
+        tr:nth-child(even) {
+            background: rgba(255,255,255,0.03);
+        }
+
+        a {
+            color: #0ff;
+            text-decoration: none;
         }
 
         .wave {
@@ -118,21 +83,34 @@
             z-index: -1;
         }
 
-        @media (max-width: 600px) {
-            input, select, .fancy-btn {
-                width: 90%;
+        @media(max-width: 600px) {
+            table, thead, tbody, tr, td, th {
+                display: block;
             }
 
-            h1 {
-                font-size: 2rem;
+            thead {
+                display: none;
             }
 
-            h2 {
-                font-size: 1.3rem;
+            tr {
+                margin-bottom: 20px;
+                border-bottom: 2px solid rgba(0,240,255,0.2);
             }
 
-            .card-block {
-                padding: 15px;
+            td {
+                text-align: right;
+                padding-left: 50%;
+                position: relative;
+            }
+
+            td::before {
+                content: attr(data-label);
+                position: absolute;
+                left: 10px;
+                top: 12px;
+                font-weight: bold;
+                color: #0ff;
+                text-align: left;
             }
         }
     </style>
@@ -141,7 +119,7 @@
 
     <h1>Кабінет користувача</h1>
 
-    <button class="fancy-btn" onclick="window.location.href='/'">Повернутися на головну</button>
+    <button onclick="window.location.href='/'">⬅️ Повернутися на головну</button>
     <br><br>
 
     {% if tests %}
@@ -170,7 +148,9 @@
                 <td data-label="Download час">{{ test.download_time }}</td>
                 <td data-label="Створено">{{ test.created_at }}</td>
                 <td data-label="Діє до">{{ test.expires_at }}</td>
-                <td data-label="Переглянути"><a href="{{ url_for('view_result', test_id=test.id) }}" target="_blank">Деталі</a></td>
+                <td data-label="Переглянути">
+                    <a href="{{ url_for('view_result', test_id=test.id) }}" target="_blank">Деталі</a>
+                </td>
             </tr>
             {% endfor %}
         </tbody>
@@ -183,5 +163,6 @@
         <path fill="#00f0ff" fill-opacity="0.3"
               d="M0,160L40,170C80,180,160,200,240,197.3C320,195,400,169,480,176C560,183,640,225,720,240C800,255,880,245,960,213.3C1040,182,1120,128,1200,117.3C1280,107,1360,139,1400,154.7L1440,170L1440,320L0,320Z"></path>
     </svg>
+
 </body>
 </html>
