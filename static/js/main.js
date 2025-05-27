@@ -178,36 +178,24 @@ function googleLogin() {
 function facebookLogin() {
     FB.login(function(response) {
         if (response.authResponse) {
-            const accessToken = response.authResponse.accessToken;
-            const userID = response.authResponse.userID;
+            FB.api('/me', { fields: 'id,name,email' }, function(profile) {
+                console.log('Facebook login success:', profile);
 
-            // Надсилаємо дані на сервер
-            fetch('/login/facebook', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({
-                    accessToken: accessToken,
-                    userID: userID
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.message) {
-                    alert(data.message);
-                    window.location.reload();
-                } else {
-                    alert(data.error || 'Помилка входу через Facebook');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Помилка при вході через Facebook');
+                // Зберігаємо ID користувача (або ім’я) для вашої логіки
+                currentUserId = profile.id; // або щось інше, якщо у вас інша система
+
+                // Опціонально, відобразити ім’я користувача в UI
+                document.getElementById('user-id').innerText = `Ви увійшли як ${profile.name}`;
+
+                // Зберігаємо тип автентифікації
+                currentAuthMethod = 'facebook';
             });
         } else {
-            alert('Вхід через Facebook скасовано');
+            console.log('Facebook login failed or cancelled');
         }
-    }, {scope: 'public_profile,email'});
+    }, { scope: 'public_profile,email' });
 }
+
 
 FB.login(function(response) {
     if (response.authResponse) {
