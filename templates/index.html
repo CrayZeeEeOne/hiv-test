@@ -5,96 +5,7 @@
     <title>Тест швидкості Інтернету</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <style>
-        body {
-            margin: 0;
-            font-family: 'Roboto', sans-serif;
-            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
-            color: #fff;
-            text-align: center;
-            padding: 20px;
-        }
 
-        h1 {
-            margin: 20px 0;
-            font-size: 2.5rem;
-            text-shadow: 0 0 10px #00f0ff;
-        }
-
-        h2 {
-            margin: 20px 0 10px;
-            font-size: 1.5rem;
-            color: #0ff;
-        }
-
-        label {
-            display: block;
-            margin: 10px 0 5px;
-            font-size: 1rem;
-        }
-
-        input, select {
-            padding: 12px;
-            margin: 5px;
-            border-radius: 10px;
-            border: none;
-            font-size: 1rem;
-            width: 250px;
-            max-width: 90%;
-        }
-
-        button {
-            background: #00f0ff;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 10px;
-            font-size: 1rem;
-            margin: 10px 5px;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-
-            button:hover {
-                background: #0ff;
-            }
-
-        pre {
-            text-align: left;
-            background: rgba(255,255,255,0.08);
-            padding: 12px;
-            border-radius: 10px;
-            overflow-x: auto;
-            width: 90%;
-            margin: 10px auto;
-        }
-
-        hr {
-            border: 1px solid rgba(255,255,255,0.1);
-            margin: 20px 0;
-        }
-
-        .wave {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            z-index: -1;
-        }
-
-        @media (max-width: 600px) {
-            input, select, button {
-                width: 90%;
-            }
-
-            h1 {
-                font-size: 2rem;
-            }
-
-            h2 {
-                font-size: 1.3rem;
-            }
-        }
-    </style>
 
     <!-- Google SDK -->
     <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -125,18 +36,6 @@
 
     <h2>Вхід через соціальні мережі</h2>
 
-    <div id="g_id_onload"
-         data-client_id="161637199681-cj1eqhcbbdur3rbmikk92uk7b0rlrc5p.apps.googleusercontent.com"
-         data-callback="handleGoogleCredentialResponse">
-    </div>
-    <div class="g_id_signin" data-type="standard"></div>
-
-    <br />
-
-    <fb:login-button scope="public_profile,email" onlogin="checkLoginState();"></fb:login-button>
-
-    <hr />
-
     <label for="server-select">Оберіть сервер:</label>
     <select id="server-select">
         {% for server in servers %}
@@ -162,7 +61,7 @@
     {% if user_id and user_id != 'guest' %}
         <div style="display: flex; gap: 10px; justify-content: center; margin: 20px 0;">
             <button onclick="window.location.href='/cabinet'">Кабінет користувача</button>
-            <button onclick="logout()" style="background: #ff4444;">Вийти</button>
+            <button onclick="logout()">Вийти</button>
         </div>
     {% else %}
         <div id="auth-buttons" style="margin: 20px 0;">
