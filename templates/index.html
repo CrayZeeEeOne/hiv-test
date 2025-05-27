@@ -5,6 +5,205 @@
     <title>Тест швидкості Інтернету</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            color: #fff;
+            text-align: center;
+            padding: 20px;
+        }
+
+        h1 {
+            margin: 20px 0;
+            font-size: 2.5rem;
+            text-shadow: 0 0 10px #00f0ff;
+        }
+
+        h2 {
+            margin: 20px 0 10px;
+            font-size: 1.5rem;
+            color: #0ff;
+        }
+
+        label {
+            display: block;
+            margin: 10px 0 5px;
+            font-size: 1rem;
+        }
+
+        input, select {
+            padding: 12px;
+            margin: 5px;
+            border-radius: 10px;
+            border: 1px solid rgba(0, 240, 255, 0.4);
+            font-size: 1rem;
+            width: 250px;
+            max-width: 90%;
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+            transition: all 0.25s ease;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #0ff;
+            box-shadow: 0 0 8px rgba(0, 240, 255, 0.5);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        select option {
+            background: #203a43;
+            color: #fff;
+        }
+
+        .fancy-btn {
+            background: linear-gradient(135deg, #00f0ff, #0ff);
+            border: none;
+            padding: 14px 26px;
+            border-radius: 12px;
+            font-size: 1rem;
+            margin: 12px 5px;
+            cursor: pointer;
+            color: #000;
+            font-weight: bold;
+            box-shadow: 0 0 10px rgba(0,240,255,0.4);
+            transition: all 0.4s ease;
+            background-size: 200% 200%;
+        }
+
+        .fancy-btn:hover {
+            background-position: right center;
+            transform: scale(1.08);
+            box-shadow: 0 0 18px rgba(0,240,255,0.7);
+        }
+
+        .fancy-btn:active {
+            transform: scale(0.95);
+        }
+
+        .card-block {
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(8px);
+            padding: 20px;
+            border-radius: 20px;
+            margin: 20px auto;
+            max-width: 800px;
+            box-shadow: 0 0 15px rgba(0,240,255,0.15);
+            transition: 0.3s ease;
+        }
+
+        .card-block h2 {
+            margin-bottom: 15px;
+            color: #0ff;
+            text-shadow: 0 0 8px #0ff;
+        }
+
+        .card-block pre {
+            text-align: left;
+            background: rgba(255,255,255,0.08);
+            padding: 12px;
+            border-radius: 10px;
+            overflow-x: auto;
+            width: 90%;
+            margin: 10px auto;
+            color: #fff;
+        }
+
+        .social-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        .social-btn {
+            width: 60px;
+            height: 60px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 12px rgba(0,0,0,0.4);
+            transition: 0.3s ease;
+        }
+
+        .social-btn img {
+            width: 30px;
+            height: 30px;
+        }
+
+        .social-btn.google {
+            background: #fff;
+        }
+
+        .social-btn.facebook {
+            background: #1877f2;
+        }
+
+        .social-btn.google:hover {
+            transform: scale(1.08);
+            box-shadow: 0 0 16px rgba(255,255,255,0.6);
+        }
+
+        .social-btn.facebook:hover {
+            transform: scale(1.08);
+            box-shadow: 0 0 16px rgba(24,119,242,0.6);
+        }
+
+        .logout-btn {
+            background: linear-gradient(135deg, #00f0ff, #0ff);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            margin-top: 10px;
+            cursor: pointer;
+            color: #000;
+            font-weight: bold;
+            box-shadow: 0 0 8px rgba(0,240,255,0.4);
+            transition: 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background-position: right center;
+            transform: scale(1.06);
+            box-shadow: 0 0 14px rgba(0,240,255,0.6);
+        }
+
+        .logout-btn:active {
+            transform: scale(0.95);
+        }
+
+        .wave {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            z-index: -1;
+        }
+
+        @media (max-width: 600px) {
+            input, select, .fancy-btn {
+                width: 90%;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            h2 {
+                font-size: 1.3rem;
+            }
+
+            .card-block {
+                padding: 15px;
+            }
+        }
+    </style>
 
 
     <!-- Google SDK -->
@@ -59,7 +258,7 @@
     <pre id="stats-area">Статистика недоступна.</pre>
 
     {% if user_id and user_id != 'guest' %}
-        <div style="display: flex; gap: 10px; justify-content: center; margin: 20px 0;">
+        <div style="margin: 20px 0;">
             <button onclick="window.location.href='/cabinet'">Кабінет користувача</button>
             <button onclick="logout()">Вийти</button>
         </div>
