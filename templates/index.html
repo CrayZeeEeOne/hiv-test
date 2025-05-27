@@ -160,27 +160,30 @@
     <pre id="stats-area">Статистика недоступна.</pre>
 
     {% if user_id and user_id != 'guest' %}
-    <button onclick="window.location.href='/cabinet'">Кабінет користувача</button>
-{% else %}
-    <div id="auth-buttons" style="margin: 20px 0;">
-        <div id="g_id_onload"
-             data-client_id="161637199681-cj1eqhcbbdur3rbmikk92uk7b0rlrc5p.apps.googleusercontent.com"
-             data-callback="handleGoogleCredentialResponse"
-             data-auto_prompt="false">
+        <div style="display: flex; gap: 10px; justify-content: center; margin: 20px 0;">
+            <button onclick="window.location.href='/cabinet'">Кабінет користувача</button>
+            <button onclick="logout()" style="background: #ff4444;">Вийти</button>
         </div>
-        <button class="g_id_signin"
-                data-type="standard"
-                data-theme="filled_blue"
-                style="background: #4285F4; border: none; padding: 12px 24px; border-radius: 4px; color: white; cursor: pointer; margin: 5px;">
-            Увійти через Google
-        </button>
+    {% else %}
+        <div id="auth-buttons" style="margin: 20px 0;">
+            <div id="g_id_onload"
+                data-client_id="161637199681-cj1eqhcbbdur3rbmikk92uk7b0rlrc5p.apps.googleusercontent.com"
+                data-callback="handleGoogleCredentialResponse"
+                data-auto_prompt="false">
+            </div>
+            <button class="g_id_signin"
+                    data-type="standard"
+                    data-theme="filled_blue"
+                    style="background: #4285F4; border: none; padding: 12px 24px; border-radius: 4px; color: white; cursor: pointer; margin: 5px;">
+                Увійти через Google
+            </button>
 
-        <button onclick="facebookLogin()"
-                style="background: #1877F2; border: none; padding: 12px 24px; border-radius: 4px; color: white; cursor: pointer; margin: 5px;">
-            Увійти через Facebook
-        </button>
-    </div>
-{% endif %}
+            <button onclick="facebookLogin()"
+                    style="background: #1877F2; border: none; padding: 12px 24px; border-radius: 4px; color: white; cursor: pointer; margin: 5px;">
+                Увійти через Facebook
+            </button>
+        </div>
+    {% endif %}
 
     <h2>Історія тестів (в межах сесії):</h2>
     <div id="history-area"></div>

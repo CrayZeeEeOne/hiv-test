@@ -188,9 +188,15 @@ function facebookLogin() {
 function logout() {
     fetch('/logout', {
         method: 'POST'
-    }).then(response => {
-        if (response.ok) {
-            window.location.reload();
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.redirect) {
+            window.location.href = data.redirect;
         }
+    })
+    .catch(error => {
+        console.error('Помилка при виході:', error);
+        alert('Сталася помилка при спробі вийти');
     });
 }
