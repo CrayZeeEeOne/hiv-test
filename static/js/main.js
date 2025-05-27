@@ -178,15 +178,36 @@ function googleLogin() {
 function facebookLogin() {
     FB.login(function(response) {
         if (response.authResponse) {
-            FB.api('/me', { fields: 'name,email' }, function(profile) {
-                console.log('Успішно увійшли як:', profile.name, profile.email);
+            const accessToken = response.authResponse.accessToken;
+            const userID = response.authResponse.userID;
+
+            // Надсилаємо дані на сервер
+            fetch('/login/facebook', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    accessToken: accessToken,
+                    userID: userID
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message) {
+                    alert(data.message);
+                    window.location.reload();
+                } else {
+                    alert(data.error || 'Помилка входу через Facebook');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Помилка при вході через Facebook');
             });
         } else {
-            console.log('Користувач скасував авторизацію.');
+            alert('Вхід через Facebook скасовано');
         }
-    }, { scope: 'public_profile,email' });
+    }, {scope: 'public_profile,email'});
 }
-
 
 
 function logout() {

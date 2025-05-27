@@ -227,6 +227,22 @@
 
     <!-- Твій основний JS -->
     <script src="js/main.js" defer></script>
+    <script>
+        window.fbAsyncInit = function() {
+            FB.init({
+                appId: '10078966155483125',
+                cookie: true,
+                xfbml: true,
+                version: 'v18.0',
+                status: true  // Додаємо для кращого відстеження статусу
+            });
+
+            // Перевіряємо статус при завантаженні сторінки
+            FB.getLoginStatus(function(response) {
+                console.log('Facebook login status:', response);
+            });
+        };
+    </script>
 </head>
 
 <body>

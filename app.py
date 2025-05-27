@@ -141,22 +141,45 @@ def login_facebook():
     access_token = data.get('accessToken')
     user_id = data.get('userID')
 
-    # Перевірка токена через Facebook Graph API
-    debug_url = f"https://graph.facebook.com/debug_token"
-    params = {
-        'input_token': access_token,
-        'access_token': f"{FACEBOOK_APP_ID}|{FACEBOOK_APP_SECRET}"
-    }
-    r = requests.get(debug_url, params=params)
-    result = r.json()
+    if not access_token or not user_id:
+        return jsonify({'error': 'Відсутній токен або ID користувача'}), 400
 
     try:
-        if result['data']['is_valid'] and result['data']['user_id'] == user_id:
+        # Перевіряємо токен
+        debug_url = "https://graph.facebook.com/debug_token"
+        params = {
+            'input_token': access_token,
+            'access_token': f"{FACEBOOK_APP_ID}|{FACEBOOK_APP_SECRET}"
+        }
+
+        # Додатковий запит для отримання інформації про користувача
+        profile_url = f"https://graph.facebook.com/{user_id}"
+        profile_params = {
+            'fields': 'id,name,email',
+            'access_token': access_token
+        }
+
+        # Виконуємо обидва запити паралельно
+        debug_response = requests.get(debug_url, params=params)
+        profile_response = requests.get(profile_url, params=profile_params)
+
+        debug_data = debug_response.json()
+        profile_data = profile_response.json()
+
+        if debug_data.get('data', {}).get('is_valid') and debug_data['data']['user_id'] == user_id:
+            # Зберігаємо інформацію про користувача в сесії
             session['user_id'] = f"fb_{user_id}"
-            return jsonify({'message': 'Успішний вхід через Facebook'})
+            session['user_name'] = profile_data.get('name', 'Facebook User')
+            session['user_email'] = profile_data.get('email', '')
+
+            return jsonify({
+                'message': f"Успішний вхід через Facebook як {profile_data.get('name', 'Facebook User')}"
+            })
         else:
             return jsonify({'error': 'Недійсний токен Facebook'}), 401
-    except:
+
+    except Exception as e:
+        print(f"Facebook login error: {str(e)}")
         return jsonify({'error': 'Помилка при перевірці Facebook токена'}), 500
 
 @app.route('/logout', methods=['POST'])
