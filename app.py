@@ -250,15 +250,17 @@ def view_result(test_id):
     conn = get_db()
     with conn.cursor() as c:
         c.execute('''
-            SELECT id, server_id, upload, download, upload_time, download_time, created_at, expires_at, user_id
+            SELECT id, server_id, upload, download, upload_time,
+                   download_time, created_at, expires_at, user_id
             FROM speedtests WHERE id = %s
         ''', (test_id,))
         row = c.fetchone()
 
     if not row:
-        return "Результат не знайдено", 404
+        return render_template('expired.html',
+                            message="Результат не знайдено",
+                            status_code=404), 404
 
-    # Перевірка і перетворення expires_at
     expires_at = row['expires_at']
     if isinstance(expires_at, str):
         expires_at_dt = datetime.strptime(expires_at, '%Y-%m-%d %H:%M:%S')
@@ -268,15 +270,22 @@ def view_result(test_id):
     now = datetime.utcnow()
 
     if expires_at_dt <= now:
-        return "Термін дії результату закінчився.", 403
+        # Форматуємо дати для відображення
+        created_at = row['created_at'].strftime('%Y-%m-%d %H:%M:%S') if not isinstance(row['created_at'], str) else row['created_at']
+        expires_at = expires_at_dt.strftime('%Y-%m-%d %H:%M:%S') if not isinstance(expires_at_dt, str) else expires_at_dt
 
-    # Переконатися, що expires_at і created_at у форматі рядка для шаблону
+        return render_template('expired.html',
+                            test_id=row['id'],
+                            created_at=created_at,
+                            expires_at=expires_at,
+                            status_code=403), 403
+
+    # Звичайне відображення результату
     if not isinstance(row['created_at'], str):
         row['created_at'] = row['created_at'].strftime('%Y-%m-%d %H:%M:%S')
     if not isinstance(row['expires_at'], str):
         row['expires_at'] = expires_at_dt.strftime('%Y-%m-%d %H:%M:%S')
 
-    # Віддати html сторінку з передачею результату
     return render_template('result.html', result=row)
 
 @app.route('/cabinet')

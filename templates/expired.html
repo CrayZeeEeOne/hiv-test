@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Результат недоступний</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .expired-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(12px);
+            padding: 30px;
+            border-radius: 20px;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 107, 107, 0.3);
+        }
+        
+        .expired-icon {
+            font-size: 3rem;
+            color: #ff6b6b;
+            margin-bottom: 20px;
+        }
+        
+        .expired-title {
+            font-size: 1.8rem;
+            color: #ff6b6b;
+            margin-bottom: 15px;
+            text-shadow: 0 0 8px rgba(255, 107, 107, 0.5);
+        }
+        
+        .expired-message {
+            font-size: 1.1rem;
+            margin-bottom: 25px;
+            line-height: 1.5;
+        }
+        
+        .test-info {
+            background: rgba(255, 255, 255, 0.08);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: left;
+        }
+        
+        .test-info dt {
+            color: #0ff;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        
+        .test-info dd {
+            margin-left: 0;
+            margin-bottom: 15px;
+        }
+        
+        .btn {
+            background: #00f0ff;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-size: 1rem;
+            margin-top: 20px;
+            cursor: pointer;
+            transition: 0.3s;
+            color: #000;
+            font-weight: bold;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .btn:hover {
+            background: #0ff;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 240, 255, 0.4);
+        }
+        
+        .wave {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            z-index: -1;
+        }
+    </style>
+</head>
+<body>
+    <div class="expired-card">
+        <div class="expired-icon">⏳</div>
+        <h1 class="expired-title">Термін дії результату закінчився</h1>
+        
+        <p class="expired-message">
+            На жаль, цей результат тесту більше не доступний.<br>
+            Будь ласка, виконайте новий тест швидкості.
+        </p>
+        
+        <div class="test-info">
+            <dl>
+                <dt>ID тесту:</dt>
+                <dd>{{ test_id }}</dd>
+                
+                <dt>Створено:</dt>
+                <dd>{{ created_at }}</dd>
+                
+                <dt>Термін дії до:</dt>
+                <dd>{{ expires_at }}</dd>
+            </dl>
+        </div>
+        
+        <a href="/" class="btn">Виконати новий тест</a>
+    </div>
+    
+    <svg class="wave" viewBox="0 0 1440 320">
+        <path fill="#00f0ff" fill-opacity="0.3"
+              d="M0,160L40,170C80,180,160,200,240,197.3C320,195,400,169,480,176C560,183,640,225,720,240C800,255,880,245,960,213.3C1040,182,1120,128,1200,117.3C1280,107,1360,139,1400,154.7L1440,170L1440,320L0,320Z"></path>
+    </svg>
+</body>
+</html>
