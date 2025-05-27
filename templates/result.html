@@ -62,9 +62,19 @@
             transition: 0.3s;
         }
 
-            button:hover {
-                background: #0ff;
-            }
+        button:hover {
+            background: #0ff;
+        }
+
+        .expired-message {
+            color: #ff6b6b;
+            font-size: 1.2rem;
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ff6b6b;
+            border-radius: 10px;
+            background: rgba(255, 107, 107, 0.1);
+        }
 
         .wave {
             position: fixed;
@@ -92,28 +102,43 @@
 <body>
 
     <div class="card">
-        <h1>Результат тесту швидкості</h1>
-        <dl>
-            <dt>ID:</dt>
-            <dd>{{ result.id }}</dd>
-            <dt>Сервер:</dt>
-            <dd>{{ result.server_id }}</dd>
-            <dt>Завантаження (Download):</dt>
-            <dd>{{ "%.2f"|format(result.download) }} Mbps</dd>
-            <dt>Час завантаження:</dt>
-            <dd>{{ "%.4f"|format(result.download_time) }} с</dd>
-            <dt>Відвантаження (Upload):</dt>
-            <dd>{{ "%.2f"|format(result.upload) }} Mbps</dd>
-            <dt>Час відвантаження:</dt>
-            <dd>{{ "%.4f"|format(result.upload_time) }} с</dd>
-            <dt>Створено:</dt>
-            <dd>{{ result.created_at }}</dd>
-            <dt>Термін дії до:</dt>
-            <dd>{{ result.expires_at }}</dd>
-            <dt>ID користувача:</dt>
-            <dd>{{ result.user_id }}</dd>
-        </dl>
-        <button onclick="window.location.href='/'">На головну</button>
+        {% if is_expired %}
+            <h1>Результат тесту швидкості</h1>
+            <div class="expired-message">
+                Термін дії результату закінчився.<br>
+                Будь ласка, виконайте новий тест.
+            </div>
+            <dl>
+                <dt>ID тесту:</dt>
+                <dd>{{ result.id }}</dd>
+                <dt>Створено:</dt>
+                <dd>{{ result.created_at }}</dd>
+                <dt>Термін дії до:</dt>
+                <dd>{{ result.expires_at }}</dd>
+            </dl>
+        {% else %}
+            <h1>Результат тесту швидкості</h1>
+            <dl>
+                <dt>ID:</dt>
+                <dd>{{ result.id }}</dd>
+                <dt>Сервер:</dt>
+                <dd>{{ result.server_id }}</dd>
+                <dt>Завантаження (Download):</dt>
+                <dd>{{ "%.2f"|format(result.download) }} Mbps</dd>
+                <dt>Час завантаження:</dt>
+                <dd>{{ "%.4f"|format(result.download_time) }} с</dd>
+                <dt>Відвантаження (Upload):</dt>
+                <dd>{{ "%.2f"|format(result.upload) }} Mbps</dd>
+                <dt>Час відвантаження:</dt>
+                <dd>{{ "%.4f"|format(result.upload_time) }} с</dd>
+                <dt>Створено:</dt>
+                <dd>{{ result.created_at }}</dd>
+                <dt>Термін дії до:</dt>
+                <dd>{{ result.expires_at }}</dd>
+                <dt>ID користувача:</dt>
+                <dd>{{ result.user_id }}</dd>
+            </dl>
+        {% endif %}
     </div>
 
     <svg class="wave" viewBox="0 0 1440 320">
