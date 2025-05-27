@@ -54,9 +54,31 @@
             transition: 0.3s;
         }
 
-            button:hover {
-                background: #0ff;
-            }
+        button:hover {
+            background: #0ff;
+        }
+
+        .auth-btn {
+            background: #4285F4;
+            color: white;
+        }
+
+        .auth-btn.facebook {
+            background: #1877F2;
+        }
+
+        .logout-btn {
+            background: #ff4444;
+            color: white;
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
 
         pre {
             text-align: left;
@@ -93,6 +115,11 @@
             h2 {
                 font-size: 1.3rem;
             }
+
+            .button-group {
+                flex-direction: column;
+                align-items: center;
+            }
         }
     </style>
 
@@ -125,15 +152,19 @@
 
     <h2>Вхід через соціальні мережі</h2>
 
-    <div id="g_id_onload"
-         data-client_id="161637199681-cj1eqhcbbdur3rbmikk92uk7b0rlrc5p.apps.googleusercontent.com"
-         data-callback="handleGoogleCredentialResponse">
+    <div class="button-group">
+        {% if user_id and user_id != 'guest' %}
+            <button onclick="window.location.href='/cabinet'">Кабінет користувача</button>
+            <button onclick="logout()" class="logout-btn">Вийти</button>
+        {% else %}
+            <div id="g_id_onload"
+                 data-client_id="161637199681-cj1eqhcbbdur3rbmikk92uk7b0rlrc5p.apps.googleusercontent.com"
+                 data-callback="handleGoogleCredentialResponse">
+            </div>
+            <button class="g_id_signin auth-btn" data-type="standard">Увійти через Google</button>
+            <button onclick="facebookLogin()" class="auth-btn facebook">Увійти через Facebook</button>
+        {% endif %}
     </div>
-    <div class="g_id_signin" data-type="standard"></div>
-
-    <br />
-
-    <fb:login-button scope="public_profile,email" onlogin="checkLoginState();"></fb:login-button>
 
     <hr />
 
@@ -158,8 +189,6 @@
 
     <h2>Статистика</h2>
     <pre id="stats-area">Статистика недоступна.</pre>
-
-    <button onclick="window.location.href='/cabinet'">Кабінет користувача</button>
 
     <h2>Історія тестів (в межах сесії):</h2>
     <div id="history-area"></div>
