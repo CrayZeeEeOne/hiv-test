@@ -178,33 +178,33 @@ function googleLogin() {
 function facebookLogin() {
     FB.login(function (response) {
         if (response.authResponse) {
-            FB.api('/me', { fields: 'name,email' }, function (userInfo) {
-                // Надсилаємо отриману інформацію на сервер
-                fetch('/auth/facebook', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        accessToken: response.authResponse.accessToken,
-                        userID: response.authResponse.userID,
-                        name: userInfo.name,
-                        email: userInfo.email
-                    })
-                })
-                .then(res => {
-                    if (res.ok) {
-                        // Оновити сторінку після успішної авторизації
-                        location.reload();
-                    } else {
-                        alert('Помилка авторизації через Facebook');
-                    }
-                });
+            const accessToken = response.authResponse.accessToken;
+
+            // Надіслати токен на бекенд для авторизації
+            fetch('/login/facebook', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ token: accessToken })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    // 🔄 Оновити сторінку після успішного логіну
+                    location.reload();
+                } else {
+                    alert('Помилка авторизації через Facebook');
+                }
+            })
+            .catch(err => {
+                console.error('Помилка при відправці токена на сервер:', err);
+                alert('Серверна помилка при авторизації через Facebook');
             });
         } else {
-            alert('Авторизацію скасовано або відхилено');
+            alert('Facebook авторизація не вдалася або була скасована');
         }
-    }, { scope: 'email' });
+    }, { scope: 'public_profile,email' });
 }
 
 
