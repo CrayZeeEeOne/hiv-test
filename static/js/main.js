@@ -176,36 +176,42 @@ function googleLogin() {
 }
 
 function facebookLogin() {
-    FB.login(function (response) {
+    FB.login(function(response) {
         if (response.authResponse) {
-            const accessToken = response.authResponse.accessToken;
-
-            // Надіслати токен на бекенд для авторизації
-            fetch('/login/facebook', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ token: accessToken })
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    // 🔄 Оновити сторінку після успішного логіну
-                    location.reload();
-                } else {
-                    alert('Помилка авторизації через Facebook');
-                }
-            })
-            .catch(err => {
-                console.error('Помилка при відправці токена на сервер:', err);
-                alert('Серверна помилка при авторизації через Facebook');
+            FB.api('/me', { fields: 'name,email' }, function(profile) {
+                // Надіслати дані користувача на сервер
+                fetch('/facebook-login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        id: profile.id,
+                        name: profile.name,
+                        email: profile.email,
+                        accessToken: response.authResponse.accessToken
+                    })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        // Наприклад, сховати кнопки входу, показати кабінет
+                        document.getElementById('auth-buttons').style.display = 'none';
+                        document.getElementById('result-area').textContent = 'Успішна авторизація через Facebook!';
+                    } else {
+                        alert('Помилка під час входу: ' + data.message);
+                    }
+                })
+                .catch(err => {
+                    console.error('Помилка авторизації:', err);
+                });
             });
         } else {
-            alert('Facebook авторизація не вдалася або була скасована');
+            console.log('Користувач скасував логін або не авторизувався.');
         }
     }, { scope: 'public_profile,email' });
 }
+
 
 
 function logout() {
