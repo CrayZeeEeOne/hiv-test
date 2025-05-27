@@ -143,7 +143,7 @@ function updateHistory() {
     historyArea.innerHTML = '';
     for (const item of history) {
         const div = document.createElement('div');
-        div.innerHTML = `Дата: ${item.date} | Сервер: ${item.server} | Upload: ${item.upload} Mbps | Download: ${item.download} Mbps | <a href="${item.link}" target="_blank">Переглянути результат</a>`;
+        div.innerHTML = `Дата: ${item.date} | Сервер: ${item.server} | Upload: ${item.upload} Mbps | Download: ${item.download} Mbps | <a href="${item.link}" target="_blank">Результат</a>`;
         historyArea.appendChild(div);
     }
 }
