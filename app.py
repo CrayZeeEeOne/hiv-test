@@ -99,7 +99,7 @@ def get_servers():
 def index():
     servers = get_servers()
     logged_in = 'user_id' in session
-    user_id = session.get('user_id', None)
+    user_id = session.get('user_id', 'guest')
     return render_template('index.html',
                          servers=servers,
                          logged_in=logged_in,

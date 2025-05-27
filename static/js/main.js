@@ -157,14 +157,19 @@ function handleGoogleCredentialResponse(response) {
     })
     .then(res => res.json())
     .then(data => {
-        alert(data.message || data.error);
+        if (data.message) {
+            alert(data.message);
+            window.location.reload();
+        } else {
+            alert(data.error || 'Помилка входу через Google');
+        }
     });
 }
 
 // Функція для Google Login
 function googleLogin() {
     google.accounts.id.initialize({
-        client_id: 'ВАШ_GOOGLE_CLIENT_ID',
+        client_id: '161637199681-cj1eqhcbbdur3rbmikk92uk7b0rlrc5p.apps.googleusercontent.com',
         callback: handleGoogleResponse
     });
     google.accounts.id.prompt();
@@ -173,35 +178,12 @@ function googleLogin() {
 function facebookLogin() {
     FB.login(function(response) {
         if (response.authResponse) {
-            // Якщо логін успішний, перевіримо статус та дістанемо інформацію
             checkLoginState();
         } else {
-            alert('Facebook login cancelled or failed.');
+            alert('Вхід через Facebook скасовано');
         }
     }, {scope: 'public_profile,email'});
 }
-
-function checkLoginState() {
-    FB.getLoginStatus(function(response) {
-        console.log('Facebook login status:', response);
-        if (response.status === 'connected') {
-            const accessToken = response.authResponse.accessToken;
-            console.log('Facebook Access Token:', accessToken);
-
-            // Тут ти можеш зробити запит на свій сервер,
-            // або показати повідомлення, або редірект:
-
-            alert('Успішний вхід через Facebook!');
-
-            // Наприклад, редірект:
-            // window.location.href = '/profile';
-
-        } else {
-            alert('Не вдалось авторизуватись через Facebook.');
-        }
-    });
-}
-
 
 function logout() {
     fetch('/logout', {
